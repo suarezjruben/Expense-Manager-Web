@@ -18,6 +18,6 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Connect Supabase before running the app');
+    expect(compiled.textContent).toContain('public/runtime-config.example.js');
   });
 });

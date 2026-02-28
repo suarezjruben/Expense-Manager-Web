@@ -23,37 +23,65 @@ The app is designed to run as a browser-only client with:
 - CSV statement import with optional column mapping memory per account
 - Supabase magic-link sign-in
 
+## Public Repo Safety
+
+This repository is intended to be safe for public GitHub hosting.
+
+What is safe to expose in the browser:
+
+- Supabase project URL
+- Supabase `publishable` key, or legacy `anon` key
+- Firebase Hosting site or project identifier
+- Firebase web app config, if the Firebase client SDK is added later
+
+What must never be committed or shipped to the browser:
+
+- Supabase `service_role` key
+- Supabase database password
+- JWT signing secret
+- Firebase service account JSON
+- Google Cloud private keys
+- Third-party admin tokens
+- CI deploy tokens
+
+Firebase Hosting can serve public runtime config to the browser, but it cannot keep browser-consumed values secret. If the app later needs real secrets, add a server-side component such as Firebase Cloud Functions, Cloud Run, or Firebase App Hosting with Secret Manager.
+
 ## Project Structure
 
 ```text
 expense-manager-web/
-|-- src/app/                 Angular UI and client-side data layer
-|-- src/environments/        Supabase environment config
-|-- supabase/schema.sql      Postgres schema + RLS policies
-|-- firebase.json            Firebase Hosting config
-|-- .firebaserc.example      Firebase project id template
+|-- public/runtime-config.example.js   Example local runtime config
+|-- src/app/                           Angular UI and client-side data layer
+|-- src/environments/                  Placeholder-only Angular environment config
+|-- supabase/schema.sql                Postgres schema + RLS policies
+|-- firebase.json                      Firebase Hosting config
+|-- .firebaserc.example                Firebase project id template
 ```
 
 ## Supabase Setup
 
 1. Create a Supabase project.
 2. In the Supabase SQL editor, run `supabase/schema.sql`.
-3. Open `src/environments/environment.ts` and set:
+3. In Supabase Auth, enable email sign-in and magic links.
+4. Add these redirect URLs in Supabase Auth:
+   - `http://localhost:4200`
+   - your Firebase Hosting domain
+   - any custom domain you actually use
+5. Copy `public/runtime-config.example.js` to `public/runtime-config.js`.
+6. Fill in your Supabase URL and either a `publishableKey` or legacy `anonKey`.
 
-```ts
-export const environment = {
-  production: false,
+Example:
+
+```js
+window.__appConfig__ = {
   supabase: {
     url: 'https://YOUR_PROJECT.supabase.co',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY'
+    publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY'
   }
 };
 ```
 
-4. In Supabase Auth, enable email sign-in and magic links.
-5. Add these redirect URLs in Supabase Auth:
-   - `http://localhost:4200`
-   - your Firebase Hosting domain
+`public/runtime-config.js` is intentionally ignored by git.
 
 ## Local Development
 
@@ -66,23 +94,63 @@ npm start
 
 The app runs at `http://localhost:4200`.
 
-## Firebase Hosting
+## GitHub Actions Deploy
+
+For a public GitHub repo, the recommended deploy path is to generate `public/runtime-config.js` during the GitHub Actions workflow instead of storing it locally in the repo.
+
+Use a GitHub Actions environment named `production` and set:
+
+Variables:
+
+- `FIREBASE_PROJECT_ID`
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
+- Optional fallback: `SUPABASE_ANON_KEY`
+
+Secrets:
+
+- `FIREBASE_SERVICE_ACCOUNT`
+
+The workflow at `.github/workflows/deploy-hosting.yml` will:
+
+1. Read GitHub Actions variables and secrets
+2. Generate `public/runtime-config.js` during CI
+3. Build the Angular app
+4. Deploy to the Firebase Hosting live channel
+
+This keeps the repo clean on GitHub, but remember that browser runtime config is still public after deployment. Only browser-safe values belong in these variables.
+
+## Firebase Hosting (Local Manual)
 
 `firebase.json` is already configured for Angular's build output at `dist/expense-manager-web/browser`.
 
-1. Set your Firebase project id in `.firebaserc`.
-   Use `.firebaserc.example` as the starting template.
-2. Build the app:
+1. Copy `.firebaserc.example` to `.firebaserc`.
+2. Set your Firebase project id in `.firebaserc`.
+3. Build the app:
 
 ```bash
 npm run build:firebase
 ```
 
-3. Deploy Hosting:
+4. Deploy Hosting:
 
 ```bash
 npm run deploy:hosting
 ```
+
+## GitHub Safety Checklist
+
+Before making the repo public:
+
+1. Keep `public/runtime-config.js` and `.firebaserc` untracked.
+2. Never place a `service_role` key or any admin secret in Angular source files.
+3. Store deploy-time values in GitHub Actions environment variables and secrets.
+4. Enable GitHub secret scanning.
+5. Enable GitHub push protection.
+6. Keep Supabase RLS enabled for every app table.
+7. Verify unauthenticated users cannot read or write app data.
+
+The repo also includes a GitHub Actions gitleaks workflow to catch accidental secret commits, but it is a backup layer, not the primary protection.
 
 ## Data Model
 

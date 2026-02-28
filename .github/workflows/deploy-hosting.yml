@@ -1,0 +1,79 @@
+name: Deploy Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy_live:
+    name: Build and Deploy Live
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate deploy config
+        shell: bash
+        run: |
+          if [ -z "$FIREBASE_PROJECT_ID" ]; then
+            echo "Missing GitHub Actions variable: FIREBASE_PROJECT_ID" >&2
+            exit 1
+          fi
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "Missing GitHub Actions variable: SUPABASE_URL" >&2
+            exit 1
+          fi
+          if [ -z "$SUPABASE_PUBLISHABLE_KEY" ] && [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Set either SUPABASE_PUBLISHABLE_KEY or SUPABASE_ANON_KEY in GitHub Actions variables." >&2
+            exit 1
+          fi
+
+      - name: Generate runtime config
+        shell: bash
+        run: |
+          node <<'EOF'
+          const fs = require('node:fs');
+
+          const config = {
+            supabase: {
+              url: process.env.SUPABASE_URL || '',
+              publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || '',
+              anonKey: process.env.SUPABASE_ANON_KEY || ''
+            }
+          };
+
+          fs.writeFileSync(
+            'public/runtime-config.js',
+            `window.__appConfig__ = ${JSON.stringify(config, null, 2)};\n`
+          );
+          EOF
+
+      - name: Build app
+        run: npm run build:firebase
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live
