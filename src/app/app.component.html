@@ -1,0 +1,69 @@
+<div class="shell">
+  <ng-container *ngIf="supabase.isConfigured; else setupState">
+    <ng-container *ngIf="auth.session$ | async as session; else authState">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span>Expense Manager</span>
+        </div>
+        <div class="topbar-actions">
+          <nav>
+            <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+            <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
+            <a routerLink="/plans" routerLinkActive="active">Plans & Categories</a>
+          </nav>
+          <div class="session-chip">
+            <span>{{ session.user.email }}</span>
+            <button type="button" (click)="signOut()" [disabled]="authBusy">Sign Out</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <router-outlet></router-outlet>
+      </main>
+    </ng-container>
+  </ng-container>
+</div>
+
+<ng-template #authState>
+  <section class="gate">
+    <article class="gate-card">
+      <p class="eyebrow">Client-Only Setup</p>
+      <h1>Sign in with Supabase</h1>
+      <p class="muted">
+        This project uses Angular in the browser, Supabase for data and auth, and Firebase Hosting for deployment.
+      </p>
+
+      <form (ngSubmit)="signIn()" class="gate-form">
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            autocomplete="email"
+            [(ngModel)]="email"
+            placeholder="you@example.com"
+          />
+        </label>
+        <button type="submit" [disabled]="authBusy">
+          {{ authBusy ? 'Sending...' : 'Send Magic Link' }}
+        </button>
+      </form>
+
+      <p class="status" *ngIf="authMessage">{{ authMessage }}</p>
+    </article>
+  </section>
+</ng-template>
+
+<ng-template #setupState>
+  <section class="gate">
+    <article class="gate-card">
+      <p class="eyebrow">Setup Required</p>
+      <h1>Connect Supabase before running the app</h1>
+      <p class="muted">
+        Add your Supabase URL and anon key in <code>src/environments/environment.ts</code>, then build and deploy with Firebase Hosting.
+      </p>
+    </article>
+  </section>
+</ng-template>

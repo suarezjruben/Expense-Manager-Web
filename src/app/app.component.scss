@@ -1,0 +1,206 @@
+:host {
+  display: block;
+}
+
+.shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(17, 138, 178, 0.16), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(6, 214, 160, 0.15), transparent 25%),
+    linear-gradient(180deg, #f8fafc 0%, #eef4f5 100%);
+  color: #12313f;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid #d7e3e8;
+  backdrop-filter: blur(8px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.brand-mark {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #118ab2, #06d6a0);
+}
+
+nav {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+nav a {
+  color: #34505e;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+nav a:hover {
+  background: #e5f4f2;
+}
+
+nav a.active {
+  background: #118ab2;
+  color: #fff;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.session-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.45rem 0.35rem 0.9rem;
+  border: 1px solid #c7dae1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+}
+
+.session-chip button {
+  border: none;
+  border-radius: 999px;
+  background: #12313f;
+  color: #fff;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.session-chip button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.gate {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.gate-card {
+  width: min(100%, 460px);
+  padding: 2rem;
+  border: 1px solid #d4e1e7;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 80px rgba(18, 49, 63, 0.08);
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #118ab2;
+}
+
+.gate-card h1 {
+  margin: 0 0 0.75rem;
+  font-size: 2rem;
+}
+
+.muted {
+  color: #52707e;
+}
+
+.gate-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.gate-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.gate-form input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #c7dae1;
+  border-radius: 0.9rem;
+  font: inherit;
+}
+
+.gate-form button {
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #118ab2, #0d9488);
+  color: #fff;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.gate-form button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.status {
+  margin: 1rem 0 0;
+  color: #12313f;
+}
+
+@media (max-width: 860px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+
+  nav {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .session-chip {
+    justify-content: space-between;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+}

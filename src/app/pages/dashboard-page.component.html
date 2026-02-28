@@ -1,0 +1,104 @@
+<section class="panel">
+  <div class="toolbar">
+    <h1>Monthly Dashboard</h1>
+    <div class="controls">
+      <label>
+        Month
+        <input type="month" [(ngModel)]="month" (change)="onMonthChanged()" />
+      </label>
+      <label>
+        Starting Balance
+        <input type="number" step="0.01" [(ngModel)]="startingBalance" />
+      </label>
+      <button type="button" (click)="saveStartingBalance()">Save</button>
+    </div>
+  </div>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+  <p *ngIf="loading">Loading...</p>
+
+  <ng-container *ngIf="summary as s">
+    <div class="cards">
+      <article>
+        <h2>Starting</h2>
+        <p>{{ s.startingBalance | currency }}</p>
+      </article>
+      <article>
+        <h2>Income Actual</h2>
+        <p>{{ s.incomeTotals.actual | currency }}</p>
+      </article>
+      <article>
+        <h2>Expense Actual</h2>
+        <p>{{ s.expenseTotals.actual | currency }}</p>
+      </article>
+      <article>
+        <h2>End Balance</h2>
+        <p>{{ s.endingBalance | currency }}</p>
+      </article>
+    </div>
+
+    <div class="totals-grid">
+      <article>
+        <h3>Expenses</h3>
+        <div class="kv"><span>Planned</span><span>{{ s.expenseTotals.planned | currency }}</span></div>
+        <div class="kv"><span>Actual</span><span>{{ s.expenseTotals.actual | currency }}</span></div>
+        <div class="kv"><span>Diff</span><span>{{ s.expenseTotals.diff | currency }}</span></div>
+      </article>
+      <article>
+        <h3>Income</h3>
+        <div class="kv"><span>Planned</span><span>{{ s.incomeTotals.planned | currency }}</span></div>
+        <div class="kv"><span>Actual</span><span>{{ s.incomeTotals.actual | currency }}</span></div>
+        <div class="kv"><span>Diff</span><span>{{ s.incomeTotals.diff | currency }}</span></div>
+      </article>
+      <article>
+        <h3>Net</h3>
+        <div class="kv"><span>{{ s.savingsLabel }}</span><span>{{ s.netChange | currency }}</span></div>
+      </article>
+    </div>
+
+    <div class="tables">
+      <div>
+        <h3>Expense Categories</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Planned</th>
+              <th>Actual</th>
+              <th>Diff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of s.expenseCategories">
+              <td>{{ row.categoryName }}</td>
+              <td>{{ row.planned | currency }}</td>
+              <td>{{ row.actual | currency }}</td>
+              <td>{{ row.diff | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3>Income Categories</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Planned</th>
+              <th>Actual</th>
+              <th>Diff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of s.incomeCategories">
+              <td>{{ row.categoryName }}</td>
+              <td>{{ row.planned | currency }}</td>
+              <td>{{ row.actual | currency }}</td>
+              <td>{{ row.diff | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</section>

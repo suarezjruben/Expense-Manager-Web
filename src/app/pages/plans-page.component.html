@@ -1,0 +1,116 @@
+<section class="panel">
+  <div class="toolbar">
+    <h1>Plans & Categories</h1>
+    <label>
+      Month
+      <input type="month" [(ngModel)]="month" (change)="onMonthChanged()" />
+    </label>
+  </div>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+  <p *ngIf="loading">Loading...</p>
+
+  <div class="layout">
+    <article>
+      <h2>Expense Plans</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Planned</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of expensePlans">
+            <td>{{ row.categoryName }}</td>
+            <td>
+              <input type="number" step="0.01" min="0" [(ngModel)]="row.plannedAmount" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" (click)="savePlans('EXPENSE')">Save Expense Plans</button>
+    </article>
+
+    <article>
+      <h2>Income Plans</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Planned</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of incomePlans">
+            <td>{{ row.categoryName }}</td>
+            <td>
+              <input type="number" step="0.01" min="0" [(ngModel)]="row.plannedAmount" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" (click)="savePlans('INCOME')">Save Income Plans</button>
+    </article>
+  </div>
+
+  <div class="layout">
+    <article>
+      <h2>Expense Categories</h2>
+      <div class="new-item">
+        <input [(ngModel)]="newExpenseCategory" placeholder="New category name" />
+        <button type="button" (click)="addCategory('EXPENSE')">Add</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Order</th>
+            <th>Active</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of expenseCategories">
+            <td><input [(ngModel)]="category.name" /></td>
+            <td><input type="number" min="0" [(ngModel)]="category.sortOrder" /></td>
+            <td><input type="checkbox" [(ngModel)]="category.active" /></td>
+            <td>
+              <button type="button" (click)="saveCategory(category)">Save</button>
+              <button type="button" class="danger" (click)="deleteCategory(category)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+
+    <article>
+      <h2>Income Categories</h2>
+      <div class="new-item">
+        <input [(ngModel)]="newIncomeCategory" placeholder="New category name" />
+        <button type="button" (click)="addCategory('INCOME')">Add</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Order</th>
+            <th>Active</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of incomeCategories">
+            <td><input [(ngModel)]="category.name" /></td>
+            <td><input type="number" min="0" [(ngModel)]="category.sortOrder" /></td>
+            <td><input type="checkbox" [(ngModel)]="category.active" /></td>
+            <td>
+              <button type="button" (click)="saveCategory(category)">Save</button>
+              <button type="button" class="danger" (click)="deleteCategory(category)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+  </div>
+</section>

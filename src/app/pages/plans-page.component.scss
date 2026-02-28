@@ -1,0 +1,76 @@
+.panel {
+  background: #fff;
+  border: 1px solid #d7e3e8;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+article {
+  border: 1px solid #dde7ea;
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: #f8fbfc;
+}
+
+.new-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+input {
+  border: 1px solid #c8d8de;
+  border-radius: 8px;
+  padding: 0.35rem 0.45rem;
+}
+
+button {
+  border: 0;
+  background: #0f766e;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+}
+
+button.danger {
+  background: #b91c1c;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e8eff1;
+  padding: 0.35rem;
+  text-align: left;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
