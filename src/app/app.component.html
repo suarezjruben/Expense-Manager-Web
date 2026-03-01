@@ -1,43 +1,145 @@
 <div class="shell">
   <ng-container *ngIf="supabase.isConfigured; else setupState">
-    <ng-container *ngIf="auth.session$ | async as session; else authState">
-      <header class="topbar">
-        <div class="brand">
-          <span class="brand-mark"></span>
-          <span>Expense Manager</span>
-        </div>
-        <div class="topbar-actions">
-          <nav>
-            <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-            <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
-            <a routerLink="/plans" routerLinkActive="active">Plans & Categories</a>
-          </nav>
-          <div class="session-chip">
-            <span>{{ session.user.email }}</span>
-            <button type="button" (click)="signOut()" [disabled]="authBusy">Sign Out</button>
-          </div>
-        </div>
-      </header>
+    <ng-container *ngIf="auth.recoveryMode$ | async; else appState">
+      <section class="gate">
+        <article class="gate-card">
+          <p class="eyebrow">Expense Manager</p>
+          <h1>Choose a new password</h1>
+          <p class="muted">
+            You opened a secure reset link for Expense Manager. Set a new password to finish signing back in.
+          </p>
 
-      <app-pwa-install-banner></app-pwa-install-banner>
+          <form (ngSubmit)="updatePassword()" class="gate-form">
+            <label>
+              New password
+              <input
+                type="password"
+                name="nextPassword"
+                autocomplete="new-password"
+                [(ngModel)]="nextPassword"
+                placeholder="Create a new password"
+              />
+            </label>
+            <label>
+              Confirm new password
+              <input
+                type="password"
+                name="confirmNextPassword"
+                autocomplete="new-password"
+                [(ngModel)]="confirmNextPassword"
+                placeholder="Re-enter the new password"
+              />
+            </label>
+            <div class="gate-actions">
+              <button type="submit" [disabled]="authBusy">
+                {{ authBusy ? 'Updating...' : 'Update Password' }}
+              </button>
+              <button type="button" class="secondary-button" (click)="signOut()" [disabled]="authBusy">
+                Cancel
+              </button>
+            </div>
+          </form>
 
-      <main class="content">
-        <router-outlet></router-outlet>
-      </main>
+          <p class="hint">Use at least 8 characters so the new password is harder to guess.</p>
+          <p class="status" *ngIf="authMessage">{{ authMessage }}</p>
+        </article>
+      </section>
     </ng-container>
+
+    <ng-template #appState>
+      <ng-container *ngIf="auth.session$ | async as session; else authState">
+        <header class="topbar">
+          <div class="brand">
+            <span class="brand-mark"></span>
+            <span>Expense Manager</span>
+          </div>
+          <div class="topbar-actions">
+            <nav>
+              <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+              <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
+              <a routerLink="/plans" routerLinkActive="active">Plans & Categories</a>
+            </nav>
+            <div class="session-chip">
+              <span>{{ session.user.email }}</span>
+              <button type="button" class="ghost-button" (click)="openPasswordPanel()" [disabled]="authBusy">
+                Set Password
+              </button>
+              <button type="button" (click)="signOut()" [disabled]="authBusy">Sign Out</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="shell-banner" *ngIf="showPasswordPanel">
+          <article class="shell-banner__card">
+            <div class="shell-banner__header">
+              <div>
+                <p class="eyebrow">Expense Manager</p>
+                <h2>Set a password</h2>
+              </div>
+              <button type="button" class="ghost-button" (click)="cancelPasswordPanel()" [disabled]="authBusy">
+                Close
+              </button>
+            </div>
+
+            <p class="muted">
+              Add a password to this account so you can sign in with email and password next time.
+            </p>
+
+            <form (ngSubmit)="updatePassword()" class="gate-form shell-banner__form">
+              <label>
+                New password
+                <input
+                  type="password"
+                  name="sessionNextPassword"
+                  autocomplete="new-password"
+                  [(ngModel)]="nextPassword"
+                  placeholder="Create a new password"
+                />
+              </label>
+              <label>
+                Confirm new password
+                <input
+                  type="password"
+                  name="sessionConfirmNextPassword"
+                  autocomplete="new-password"
+                  [(ngModel)]="confirmNextPassword"
+                  placeholder="Re-enter the new password"
+                />
+              </label>
+              <div class="gate-actions">
+                <button type="submit" [disabled]="authBusy">
+                  {{ authBusy ? 'Updating...' : 'Save Password' }}
+                </button>
+                <button type="button" class="secondary-button" (click)="cancelPasswordPanel()" [disabled]="authBusy">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </article>
+        </section>
+
+        <p class="shell-status" *ngIf="authMessage">{{ authMessage }}</p>
+
+        <app-pwa-install-banner></app-pwa-install-banner>
+
+        <main class="content">
+          <router-outlet></router-outlet>
+        </main>
+      </ng-container>
+    </ng-template>
   </ng-container>
 </div>
 
 <ng-template #authState>
   <section class="gate">
     <article class="gate-card">
-      <p class="eyebrow">Client-Only Setup</p>
-      <h1>Sign in with Supabase</h1>
+      <p class="eyebrow">Expense Manager</p>
+      <h1>Welcome back</h1>
       <p class="muted">
-        This project uses Angular in the browser, Supabase for data and auth, and Firebase Hosting for deployment.
+        Sign in with your email and password to keep budgets, transactions, and plans in one place.
       </p>
 
-      <form (ngSubmit)="signIn()" class="gate-form">
+      <form (ngSubmit)="signInWithPassword()" class="gate-form">
         <label>
           Email
           <input
@@ -48,10 +150,38 @@
             placeholder="you@example.com"
           />
         </label>
-        <button type="submit" [disabled]="authBusy">
-          {{ authBusy ? 'Sending...' : 'Send Magic Link' }}
-        </button>
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            [(ngModel)]="password"
+            placeholder="Enter your password"
+          />
+        </label>
+        <div class="gate-actions">
+          <button type="submit" [disabled]="authBusy">
+            {{ authBusy ? 'Working...' : 'Sign In' }}
+          </button>
+          <button type="button" class="secondary-button" (click)="signUpWithPassword()" [disabled]="authBusy">
+            Create Account
+          </button>
+        </div>
       </form>
+
+      <div class="auth-links">
+        <button type="button" class="link-button" (click)="sendPasswordReset()" [disabled]="authBusy">
+          {{ authBusy ? 'Working...' : 'Forgot password?' }}
+        </button>
+        <button type="button" class="link-button" (click)="signInWithMagicLink()" [disabled]="authBusy">
+          {{ authBusy ? 'Working...' : 'Email me a sign-in link' }}
+        </button>
+      </div>
+
+      <p class="hint">
+        New accounts usually need email confirmation first. Sign-in links only work for existing accounts.
+      </p>
 
       <p class="status" *ngIf="authMessage">{{ authMessage }}</p>
     </article>

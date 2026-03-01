@@ -13,3 +13,46 @@ body {
 body {
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
+
+.shell-banner,
+.shell-status {
+  max-width: 1200px;
+  margin: 1rem auto 0;
+  padding: 0 1.25rem;
+}
+
+.shell-banner__card {
+  padding: 1.25rem;
+  border: 1px solid #d4e1e7;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.shell-banner__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.shell-status {
+  color: #12313f;
+  font-weight: 600;
+}
+
+.ghost-button {
+  border: 1px solid #c7dae1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #12313f;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+@media (max-width: 860px) {
+  .shell-banner,
+  .shell-status {
+    padding: 0 1rem;
+  }
+}
