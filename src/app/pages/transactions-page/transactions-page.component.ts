@@ -1,9 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { MonthStateService } from '../../core/month-state.service';
+import {
+  InlineDropdownAction,
+  InlineDropdownComponent,
+  InlineDropdownItem
+} from '../../components/inline-dropdown/inline-dropdown.component';
 import {
   AccountDto,
   CategoryDto,
@@ -35,23 +40,32 @@ type CategoryDialogSource = 'FORM' | 'TRANSACTION';
 @Component({
   selector: 'app-transactions-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, InlineDropdownComponent],
   templateUrl: './transactions-page.component.html',
   styleUrl: './transactions-page.component.scss'
 })
 export class TransactionsPageComponent implements OnInit {
-  readonly accountDropdownKey = 'account';
+  readonly categoryDropdownActions: InlineDropdownAction[] = [
+    {
+      id: 'add',
+      title: 'Add category',
+      ariaLabel: 'Add category',
+      icon: 'plus'
+    }
+  ];
 
   month: string;
   loading = false;
   uploading = false;
   error = '';
   accountDialogError = '';
+  deleteAccountError = '';
+  deletingAccount = false;
 
   accounts: AccountDto[] = [];
-  accountSelection: number | string | null = null;
   selectedAccountId: number | null = null;
   newAccountName = '';
+  deleteAccountConfirmationName = '';
   selectedStatementFile: File | null = null;
   selectedStatementFileName = '';
   importSummary: ImportSummaryDto | null = null;
@@ -78,12 +92,12 @@ export class TransactionsPageComponent implements OnInit {
   showExpenseDialog = false;
   showIncomeDialog = false;
   showCategoryDialog = false;
+  showDeleteAccountDialog = false;
   categoryDialogType: TransactionType | null = null;
   categoryDialogSource: CategoryDialogSource = 'FORM';
   categoryDialogTransactionId: number | null = null;
   categoryDialogPreviousSelection: number | null = null;
   activeMobileTransactionTab: TransactionType = 'EXPENSE';
-  activeDropdownKey: string | null = null;
 
   expenseForm: NewTransactionForm = this.createDefaultForm();
   incomeForm: NewTransactionForm = this.createDefaultForm();
@@ -108,7 +122,6 @@ export class TransactionsPageComponent implements OnInit {
         this.accounts = accounts.filter((account) => account.active);
         if (!this.accounts.length) {
           this.error = 'No active accounts available';
-          this.accountSelection = null;
           this.expenses = [];
           this.incomes = [];
           this.loading = false;
@@ -118,7 +131,6 @@ export class TransactionsPageComponent implements OnInit {
         if (this.selectedAccountId == null || !this.accounts.some((account) => account.id === this.selectedAccountId)) {
           this.selectedAccountId = this.accounts[0].id;
         }
-        this.accountSelection = this.selectedAccountId;
 
         this.loadTransactionsForSelectedAccount();
       },
@@ -135,16 +147,6 @@ export class TransactionsPageComponent implements OnInit {
     this.load();
   }
 
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    this.closeDropdowns();
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscapeKey(): void {
-    this.closeDropdowns();
-  }
-
   addExpense(): void {
     this.activeMobileTransactionTab = 'EXPENSE';
     this.addTransaction('EXPENSE', this.expenseForm);
@@ -156,35 +158,77 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openAccountDialog(): void {
-    this.closeDropdowns();
     this.showAccountDialog = true;
     this.newAccountName = '';
     this.accountDialogError = '';
   }
 
   closeAccountDialog(): void {
-    this.closeDropdowns();
     this.showAccountDialog = false;
     this.newAccountName = '';
     this.accountDialogError = '';
-    this.accountSelection = this.selectedAccountId;
+  }
+
+  openDeleteAccountDialog(): void {
+    if (!this.selectedAccountId) {
+      return;
+    }
+
+    this.showDeleteAccountDialog = true;
+    this.deleteAccountConfirmationName = '';
+    this.deleteAccountError = '';
+  }
+
+  closeDeleteAccountDialog(): void {
+    this.showDeleteAccountDialog = false;
+    this.deleteAccountConfirmationName = '';
+    this.deleteAccountError = '';
+    this.deletingAccount = false;
+  }
+
+  deleteSelectedAccount(): void {
+    if (!this.selectedAccountId) {
+      this.deleteAccountError = 'Account is required.';
+      return;
+    }
+
+    if (this.deleteAccountConfirmationName.trim() !== this.selectedAccountName) {
+      this.deleteAccountError = 'Type the account name exactly to confirm deletion.';
+      return;
+    }
+
+    this.deletingAccount = true;
+    this.deleteAccountError = '';
+
+    this.api.deleteAccount(this.selectedAccountId).subscribe({
+      next: () => {
+        this.selectedAccountId = null;
+        this.showDeleteAccountDialog = false;
+        this.deleteAccountConfirmationName = '';
+        this.deletingAccount = false;
+        this.importSummary = null;
+        this.resetUploadDialogState();
+        this.load();
+      },
+      error: (error) => {
+        this.deletingAccount = false;
+        this.deleteAccountError = this.toMessage(error);
+      }
+    });
   }
 
   openUploadDialog(): void {
-    this.closeDropdowns();
     this.showUploadDialog = true;
     this.error = '';
   }
 
   closeUploadDialog(): void {
-    this.closeDropdowns();
     this.showUploadDialog = false;
     this.error = '';
     this.resetUploadDialogState();
   }
 
   openExpenseDialog(): void {
-    this.closeDropdowns();
     this.activeMobileTransactionTab = 'EXPENSE';
     this.showExpenseDialog = true;
     this.error = '';
@@ -192,7 +236,6 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   closeExpenseDialog(): void {
-    this.closeDropdowns();
     this.showExpenseDialog = false;
     this.closeCategoryDialog();
     this.error = '';
@@ -200,7 +243,6 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openIncomeDialog(): void {
-    this.closeDropdowns();
     this.activeMobileTransactionTab = 'INCOME';
     this.showIncomeDialog = true;
     this.error = '';
@@ -212,7 +254,6 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   closeIncomeDialog(): void {
-    this.closeDropdowns();
     this.showIncomeDialog = false;
     this.closeCategoryDialog();
     this.error = '';
@@ -220,7 +261,6 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openCategoryDialog(type: TransactionType, source: CategoryDialogSource, transactionId?: number): void {
-    this.closeDropdowns();
     this.showCategoryDialog = true;
     this.categoryDialogType = type;
     this.categoryDialogSource = source;
@@ -238,7 +278,6 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   closeCategoryDialog(restorePreviousSelection = true): void {
-    this.closeDropdowns();
     if (restorePreviousSelection && this.categoryDialogType) {
       this.restoreCategoryDialogSelection();
     }
@@ -260,71 +299,29 @@ export class TransactionsPageComponent implements OnInit {
     this.categoryDialogPreviousSelection = null;
   }
 
-  toggleDropdown(key: string): void {
-    this.activeDropdownKey = this.activeDropdownKey === key ? null : key;
-  }
-
-  closeDropdowns(): void {
-    this.activeDropdownKey = null;
-  }
-
-  isDropdownOpen(key: string): boolean {
-    return this.activeDropdownKey === key;
-  }
-
-  getDialogDropdownKey(type: TransactionType): string {
-    return `${type.toLowerCase()}-dialog-category`;
-  }
-
-  getTransactionDropdownKey(type: TransactionType, transactionId: number): string {
-    return `${type.toLowerCase()}-transaction-category-${transactionId}`;
-  }
-
-  getAccountSelectionLabel(): string {
-    if (this.selectedAccountId == null) {
-      return 'Select account';
-    }
-
-    return this.accounts.find((account) => account.id === this.selectedAccountId)?.name ?? 'Select account';
-  }
-
-  getDialogCategoryLabel(type: TransactionType): string {
-    return this.getCategoryLabel(type, type === 'EXPENSE' ? this.expenseForm.categoryId : this.incomeForm.categoryId);
-  }
-
-  getTransactionCategoryLabel(type: TransactionType, transactionId: number): string {
-    const transaction = (type === 'EXPENSE' ? this.expenses : this.incomes).find((item) => item.id === transactionId);
-    if (!transaction) {
-      return 'Select category';
-    }
-
-    return this.getCategoryLabel(type, this.getSelectedCategoryId(type, transaction));
-  }
-
   selectAccount(accountId: number): void {
-    this.closeDropdowns();
-    this.accountSelection = accountId;
     this.selectedAccountId = accountId;
     this.load();
   }
 
-  openAccountDialogFromDropdown(): void {
-    this.closeDropdowns();
+  onAccountDropdownAction(actionId: string): void {
+    if (actionId === 'delete') {
+      this.openDeleteAccountDialog();
+      return;
+    }
+
     this.openAccountDialog();
   }
 
   selectDialogCategoryOption(type: TransactionType, categoryId: number): void {
-    this.closeDropdowns();
     this.selectDialogCategory(type, categoryId);
   }
 
-  openCategoryDialogFromDropdown(type: TransactionType, source: CategoryDialogSource, transactionId?: number): void {
-    this.closeDropdowns();
+  onCategoryDropdownAction(type: TransactionType, source: CategoryDialogSource, transactionId?: number): void {
     this.openCategoryDialog(type, source, transactionId);
   }
 
   selectTransactionCategoryOption(type: TransactionType, transactionId: number, categoryId: number): void {
-    this.closeDropdowns();
     this.selectTransactionCategory(type, transactionId, categoryId);
   }
 
@@ -388,6 +385,46 @@ export class TransactionsPageComponent implements OnInit {
 
   get selectedAccountName(): string {
     return this.accounts.find((account) => account.id === this.selectedAccountId)?.name ?? 'Selected Account';
+  }
+
+  get accountDropdownItems(): InlineDropdownItem[] {
+    return this.accounts.map((account) => ({
+      value: account.id,
+      label: account.name
+    }));
+  }
+
+  get accountDropdownActions(): InlineDropdownAction[] {
+    return [
+      {
+        id: 'add',
+        title: 'Add account',
+        ariaLabel: 'Add account',
+        icon: 'plus'
+      },
+      {
+        id: 'delete',
+        title: 'Delete account',
+        ariaLabel: 'Delete account',
+        icon: 'trash',
+        variant: 'danger',
+        disabled: this.selectedAccountId == null
+      }
+    ];
+  }
+
+  get expenseCategoryDropdownItems(): InlineDropdownItem[] {
+    return this.expenseCategories.map((category) => ({
+      value: category.id,
+      label: category.name
+    }));
+  }
+
+  get incomeCategoryDropdownItems(): InlineDropdownItem[] {
+    return this.incomeCategories.map((category) => ({
+      value: category.id,
+      label: category.name
+    }));
   }
 
   formatShortDate(value: string): string {
@@ -563,7 +600,6 @@ export class TransactionsPageComponent implements OnInit {
       next: (account) => {
         this.newAccountName = '';
         this.selectedAccountId = account.id;
-        this.accountSelection = account.id;
         this.showAccountDialog = false;
         this.load();
       },
@@ -801,15 +837,6 @@ export class TransactionsPageComponent implements OnInit {
 
     const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
     return categories.find((category) => category.name.trim().toLowerCase() === normalized);
-  }
-
-  private getCategoryLabel(type: TransactionType, categoryId: number | null): string {
-    if (categoryId == null) {
-      return 'Select category';
-    }
-
-    const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
-    return categories.find((category) => category.id === categoryId)?.name ?? 'Select category';
   }
 
   private selectDialogCategory(type: TransactionType, categoryId: number): void {

@@ -8,44 +8,14 @@
       </label>
       <label>
         Account
-        <div class="inline-select" (click)="$event.stopPropagation()">
-          <button
-            type="button"
-            class="inline-select__trigger"
-            aria-haspopup="listbox"
-            [attr.aria-expanded]="isDropdownOpen(accountDropdownKey)"
-            [class.inline-select__trigger--placeholder]="selectedAccountId == null"
-            (click)="toggleDropdown(accountDropdownKey)"
-          >
-            <span class="inline-select__value">{{ getAccountSelectionLabel() }}</span>
-            <svg class="inline-select__chevron" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
-            </svg>
-          </button>
-
-          <div class="inline-select__panel" role="listbox" *ngIf="isDropdownOpen(accountDropdownKey)">
-            <button
-              type="button"
-              class="inline-select__option"
-              *ngFor="let account of accounts"
-              [class.inline-select__option--selected]="account.id === selectedAccountId"
-              (click)="selectAccount(account.id)"
-            >
-              <span class="inline-select__option-label">{{ account.name }}</span>
-            </button>
-            <button
-              type="button"
-              class="inline-select__option inline-select__option--add"
-              title="Add account"
-              aria-label="Add account"
-              (click)="openAccountDialogFromDropdown()"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <app-inline-dropdown
+          [items]="accountDropdownItems"
+          [selectedValue]="selectedAccountId"
+          [placeholder]="'Select account'"
+          [actions]="accountDropdownActions"
+          (selectionChange)="selectAccount($event)"
+          (actionSelected)="onAccountDropdownAction($event)"
+        />
       </label>
     </div>
   </div>
@@ -180,47 +150,14 @@
                 <td>{{ txn.amount | currency }}</td>
                 <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
                 <td class="category-cell">
-                  <div class="inline-select inline-select--table" (click)="$event.stopPropagation()">
-                    <button
-                      type="button"
-                      class="inline-select__trigger"
-                      aria-haspopup="listbox"
-                      [attr.aria-expanded]="isDropdownOpen(getTransactionDropdownKey('EXPENSE', txn.id))"
-                      (click)="toggleDropdown(getTransactionDropdownKey('EXPENSE', txn.id))"
-                    >
-                      <span class="inline-select__value">{{ getTransactionCategoryLabel('EXPENSE', txn.id) }}</span>
-                      <svg class="inline-select__chevron" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
-                      </svg>
-                    </button>
-
-                    <div
-                      class="inline-select__panel"
-                      role="listbox"
-                      *ngIf="isDropdownOpen(getTransactionDropdownKey('EXPENSE', txn.id))"
-                    >
-                      <button
-                        type="button"
-                        class="inline-select__option"
-                        *ngFor="let category of expenseCategories"
-                        [class.inline-select__option--selected]="category.id === expenseCategoryByTransactionId[txn.id]"
-                        (click)="selectTransactionCategoryOption('EXPENSE', txn.id, category.id)"
-                      >
-                        <span class="inline-select__option-label">{{ category.name }}</span>
-                      </button>
-                      <button
-                        type="button"
-                        class="inline-select__option inline-select__option--add"
-                        title="Add expense category"
-                        aria-label="Add expense category"
-                        (click)="openCategoryDialogFromDropdown('EXPENSE', 'TRANSACTION', txn.id)"
-                      >
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
+                  <app-inline-dropdown
+                    [items]="expenseCategoryDropdownItems"
+                    [selectedValue]="expenseCategoryByTransactionId[txn.id]"
+                    [placeholder]="'Select category'"
+                    [actions]="categoryDropdownActions"
+                    (selectionChange)="selectTransactionCategoryOption('EXPENSE', txn.id, $event)"
+                    (actionSelected)="onCategoryDropdownAction('EXPENSE', 'TRANSACTION', txn.id)"
+                  />
                 </td>
                 <td class="actions-cell">
                   <div class="actions">
@@ -266,47 +203,14 @@
                     </div>
                     <div class="transaction-detail-item transaction-detail-item--category">
                       <span class="transaction-detail-label">Category</span>
-                      <div class="inline-select" (click)="$event.stopPropagation()">
-                        <button
-                          type="button"
-                          class="inline-select__trigger"
-                          aria-haspopup="listbox"
-                          [attr.aria-expanded]="isDropdownOpen(getTransactionDropdownKey('EXPENSE', txn.id))"
-                          (click)="toggleDropdown(getTransactionDropdownKey('EXPENSE', txn.id))"
-                        >
-                          <span class="inline-select__value">{{ getTransactionCategoryLabel('EXPENSE', txn.id) }}</span>
-                          <svg class="inline-select__chevron" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
-                          </svg>
-                        </button>
-
-                        <div
-                          class="inline-select__panel"
-                          role="listbox"
-                          *ngIf="isDropdownOpen(getTransactionDropdownKey('EXPENSE', txn.id))"
-                        >
-                          <button
-                            type="button"
-                            class="inline-select__option"
-                            *ngFor="let category of expenseCategories"
-                            [class.inline-select__option--selected]="category.id === expenseCategoryByTransactionId[txn.id]"
-                            (click)="selectTransactionCategoryOption('EXPENSE', txn.id, category.id)"
-                          >
-                            <span class="inline-select__option-label">{{ category.name }}</span>
-                          </button>
-                          <button
-                            type="button"
-                            class="inline-select__option inline-select__option--add"
-                            title="Add expense category"
-                            aria-label="Add expense category"
-                            (click)="openCategoryDialogFromDropdown('EXPENSE', 'TRANSACTION', txn.id)"
-                          >
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
+                      <app-inline-dropdown
+                        [items]="expenseCategoryDropdownItems"
+                        [selectedValue]="expenseCategoryByTransactionId[txn.id]"
+                        [placeholder]="'Select category'"
+                        [actions]="categoryDropdownActions"
+                        (selectionChange)="selectTransactionCategoryOption('EXPENSE', txn.id, $event)"
+                        (actionSelected)="onCategoryDropdownAction('EXPENSE', 'TRANSACTION', txn.id)"
+                      />
                     </div>
                   </div>
                 </td>
@@ -397,47 +301,14 @@
                 <td>{{ txn.amount | currency }}</td>
                 <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
                 <td class="category-cell">
-                  <div class="inline-select inline-select--table" (click)="$event.stopPropagation()">
-                    <button
-                      type="button"
-                      class="inline-select__trigger"
-                      aria-haspopup="listbox"
-                      [attr.aria-expanded]="isDropdownOpen(getTransactionDropdownKey('INCOME', txn.id))"
-                      (click)="toggleDropdown(getTransactionDropdownKey('INCOME', txn.id))"
-                    >
-                      <span class="inline-select__value">{{ getTransactionCategoryLabel('INCOME', txn.id) }}</span>
-                      <svg class="inline-select__chevron" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
-                      </svg>
-                    </button>
-
-                    <div
-                      class="inline-select__panel"
-                      role="listbox"
-                      *ngIf="isDropdownOpen(getTransactionDropdownKey('INCOME', txn.id))"
-                    >
-                      <button
-                        type="button"
-                        class="inline-select__option"
-                        *ngFor="let category of incomeCategories"
-                        [class.inline-select__option--selected]="category.id === incomeCategoryByTransactionId[txn.id]"
-                        (click)="selectTransactionCategoryOption('INCOME', txn.id, category.id)"
-                      >
-                        <span class="inline-select__option-label">{{ category.name }}</span>
-                      </button>
-                      <button
-                        type="button"
-                        class="inline-select__option inline-select__option--add"
-                        title="Add income category"
-                        aria-label="Add income category"
-                        (click)="openCategoryDialogFromDropdown('INCOME', 'TRANSACTION', txn.id)"
-                      >
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
+                  <app-inline-dropdown
+                    [items]="incomeCategoryDropdownItems"
+                    [selectedValue]="incomeCategoryByTransactionId[txn.id]"
+                    [placeholder]="'Select category'"
+                    [actions]="categoryDropdownActions"
+                    (selectionChange)="selectTransactionCategoryOption('INCOME', txn.id, $event)"
+                    (actionSelected)="onCategoryDropdownAction('INCOME', 'TRANSACTION', txn.id)"
+                  />
                 </td>
                 <td class="actions-cell">
                   <div class="actions">
@@ -483,47 +354,14 @@
                     </div>
                     <div class="transaction-detail-item transaction-detail-item--category">
                       <span class="transaction-detail-label">Category</span>
-                      <div class="inline-select" (click)="$event.stopPropagation()">
-                        <button
-                          type="button"
-                          class="inline-select__trigger"
-                          aria-haspopup="listbox"
-                          [attr.aria-expanded]="isDropdownOpen(getTransactionDropdownKey('INCOME', txn.id))"
-                          (click)="toggleDropdown(getTransactionDropdownKey('INCOME', txn.id))"
-                        >
-                          <span class="inline-select__value">{{ getTransactionCategoryLabel('INCOME', txn.id) }}</span>
-                          <svg class="inline-select__chevron" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
-                          </svg>
-                        </button>
-
-                        <div
-                          class="inline-select__panel"
-                          role="listbox"
-                          *ngIf="isDropdownOpen(getTransactionDropdownKey('INCOME', txn.id))"
-                        >
-                          <button
-                            type="button"
-                            class="inline-select__option"
-                            *ngFor="let category of incomeCategories"
-                            [class.inline-select__option--selected]="category.id === incomeCategoryByTransactionId[txn.id]"
-                            (click)="selectTransactionCategoryOption('INCOME', txn.id, category.id)"
-                          >
-                            <span class="inline-select__option-label">{{ category.name }}</span>
-                          </button>
-                          <button
-                            type="button"
-                            class="inline-select__option inline-select__option--add"
-                            title="Add income category"
-                            aria-label="Add income category"
-                            (click)="openCategoryDialogFromDropdown('INCOME', 'TRANSACTION', txn.id)"
-                          >
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
+                      <app-inline-dropdown
+                        [items]="incomeCategoryDropdownItems"
+                        [selectedValue]="incomeCategoryByTransactionId[txn.id]"
+                        [placeholder]="'Select category'"
+                        [actions]="categoryDropdownActions"
+                        (selectionChange)="selectTransactionCategoryOption('INCOME', txn.id, $event)"
+                        (actionSelected)="onCategoryDropdownAction('INCOME', 'TRANSACTION', txn.id)"
+                      />
                     </div>
                   </div>
                 </td>
@@ -598,6 +436,52 @@
         <div class="dialog-card__actions">
           <button type="submit">Add Account</button>
           <button type="button" class="ghost-button" (click)="closeAccountDialog()">Cancel</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <div class="dialog-backdrop dialog-backdrop--nested" *ngIf="showDeleteAccountDialog" (click)="closeDeleteAccountDialog()">
+    <article
+      class="dialog-card dialog-card--danger"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-account-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="delete-account-dialog-title">Delete Account</h2>
+      <div class="warning-callout">
+        <strong>Warning:</strong> This permanently deletes <strong>{{ selectedAccountName }}</strong>, every expense and
+        income transaction tied to it, statement import history, and saved CSV mappings. This cannot be undone.
+      </div>
+      <p class="muted">
+        Type <strong>{{ selectedAccountName }}</strong> exactly to confirm account deletion.
+      </p>
+
+      <form class="dialog-form" (ngSubmit)="deleteSelectedAccount()">
+        <label>
+          Confirm account name
+          <input
+            name="deleteAccountConfirmation"
+            type="text"
+            [(ngModel)]="deleteAccountConfirmationName"
+            [placeholder]="selectedAccountName"
+            autocomplete="off"
+            autofocus
+          />
+        </label>
+
+        <p class="error" *ngIf="deleteAccountError">{{ deleteAccountError }}</p>
+
+        <div class="dialog-card__actions">
+          <button
+            type="submit"
+            class="danger"
+            [disabled]="deletingAccount || deleteAccountConfirmationName.trim() !== selectedAccountName"
+          >
+            {{ deletingAccount ? 'Deleting...' : 'Delete Account' }}
+          </button>
+          <button type="button" class="ghost-button" (click)="closeDeleteAccountDialog()">Cancel</button>
         </div>
       </form>
     </article>
@@ -706,48 +590,15 @@
         </label>
         <label>
           Category
-          <div class="inline-select inline-select--stacked" (click)="$event.stopPropagation()">
-            <button
-              type="button"
-              class="inline-select__trigger"
-              aria-haspopup="listbox"
-              [attr.aria-expanded]="isDropdownOpen(getDialogDropdownKey('EXPENSE'))"
-              [class.inline-select__trigger--placeholder]="expenseForm.categoryId == null"
-              (click)="toggleDropdown(getDialogDropdownKey('EXPENSE'))"
-            >
-              <span class="inline-select__value">{{ getDialogCategoryLabel('EXPENSE') }}</span>
-              <svg class="inline-select__chevron" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
-              </svg>
-            </button>
-
-            <div
-              class="inline-select__panel"
-              role="listbox"
-              *ngIf="isDropdownOpen(getDialogDropdownKey('EXPENSE'))"
-            >
-              <button
-                type="button"
-                class="inline-select__option"
-                *ngFor="let category of expenseCategories"
-                [class.inline-select__option--selected]="category.id === expenseForm.categoryId"
-                (click)="selectDialogCategoryOption('EXPENSE', category.id)"
-              >
-                <span class="inline-select__option-label">{{ category.name }}</span>
-              </button>
-              <button
-                type="button"
-                class="inline-select__option inline-select__option--add"
-                title="Add expense category"
-                aria-label="Add expense category"
-                (click)="openCategoryDialogFromDropdown('EXPENSE', 'FORM')"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <app-inline-dropdown
+            [items]="expenseCategoryDropdownItems"
+            [selectedValue]="expenseForm.categoryId"
+            [placeholder]="'Select category'"
+            [stackedPanel]="true"
+            [actions]="categoryDropdownActions"
+            (selectionChange)="selectDialogCategoryOption('EXPENSE', $event)"
+            (actionSelected)="onCategoryDropdownAction('EXPENSE', 'FORM')"
+          />
         </label>
 
         <p class="error" *ngIf="error">{{ error }}</p>
@@ -786,48 +637,15 @@
         </label>
         <label>
           Category
-          <div class="inline-select inline-select--stacked" (click)="$event.stopPropagation()">
-            <button
-              type="button"
-              class="inline-select__trigger"
-              aria-haspopup="listbox"
-              [attr.aria-expanded]="isDropdownOpen(getDialogDropdownKey('INCOME'))"
-              [class.inline-select__trigger--placeholder]="incomeForm.categoryId == null"
-              (click)="toggleDropdown(getDialogDropdownKey('INCOME'))"
-            >
-              <span class="inline-select__value">{{ getDialogCategoryLabel('INCOME') }}</span>
-              <svg class="inline-select__chevron" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
-              </svg>
-            </button>
-
-            <div
-              class="inline-select__panel"
-              role="listbox"
-              *ngIf="isDropdownOpen(getDialogDropdownKey('INCOME'))"
-            >
-              <button
-                type="button"
-                class="inline-select__option"
-                *ngFor="let category of incomeCategories"
-                [class.inline-select__option--selected]="category.id === incomeForm.categoryId"
-                (click)="selectDialogCategoryOption('INCOME', category.id)"
-              >
-                <span class="inline-select__option-label">{{ category.name }}</span>
-              </button>
-              <button
-                type="button"
-                class="inline-select__option inline-select__option--add"
-                title="Add income category"
-                aria-label="Add income category"
-                (click)="openCategoryDialogFromDropdown('INCOME', 'FORM')"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <app-inline-dropdown
+            [items]="incomeCategoryDropdownItems"
+            [selectedValue]="incomeForm.categoryId"
+            [placeholder]="'Select category'"
+            [stackedPanel]="true"
+            [actions]="categoryDropdownActions"
+            (selectionChange)="selectDialogCategoryOption('INCOME', $event)"
+            (actionSelected)="onCategoryDropdownAction('INCOME', 'FORM')"
+          />
         </label>
 
         <p class="error" *ngIf="error">{{ error }}</p>

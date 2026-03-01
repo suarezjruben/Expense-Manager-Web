@@ -51,6 +51,10 @@ export class ApiService {
     return defer(() => from(this.createAccountAsync(request)));
   }
 
+  deleteAccount(accountId: number) {
+    return defer(() => from(this.deleteAccountAsync(accountId)));
+  }
+
   listCategories(type?: CategoryType) {
     return defer(() => from(this.listCategoriesAsync(type)));
   }
@@ -209,6 +213,39 @@ export class ApiService {
     }
 
     return this.toAccountDto(account);
+  }
+
+  private async deleteAccountAsync(accountId: number): Promise<void> {
+    const userId = await this.supabase.getRequiredUserId();
+    const account = await this.resolveAccount(userId, accountId);
+
+    const { error: transactionsError } = await this.supabase.client
+      .from('transactions')
+      .delete()
+      .eq('user_id', userId)
+      .eq('account_id', account.id);
+    this.throwIfError(transactionsError);
+
+    const { error: importBatchesError } = await this.supabase.client
+      .from('import_batches')
+      .delete()
+      .eq('user_id', userId)
+      .eq('account_id', account.id);
+    this.throwIfError(importBatchesError);
+
+    const { error: mappingsError } = await this.supabase.client
+      .from('csv_mappings')
+      .delete()
+      .eq('user_id', userId)
+      .eq('account_id', account.id);
+    this.throwIfError(mappingsError);
+
+    const { error: accountError } = await this.supabase.client
+      .from('accounts')
+      .delete()
+      .eq('user_id', userId)
+      .eq('id', account.id);
+    this.throwIfError(accountError);
   }
 
   private async listCategoriesAsync(type?: CategoryType): Promise<CategoryDto[]> {

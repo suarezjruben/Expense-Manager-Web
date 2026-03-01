@@ -1,0 +1,56 @@
+<div class="inline-dropdown" (click)="$event.stopPropagation()">
+  <button
+    type="button"
+    class="inline-dropdown__trigger"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="open"
+    [attr.aria-controls]="panelId"
+    [class.inline-dropdown__trigger--placeholder]="isPlaceholder"
+    [disabled]="disabled"
+    (click)="toggle()"
+  >
+    <span class="inline-dropdown__value">{{ selectedLabel }}</span>
+    <svg class="inline-dropdown__chevron" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
+    </svg>
+  </button>
+
+  <div
+    *ngIf="open"
+    [id]="panelId"
+    class="inline-dropdown__panel"
+    [class.inline-dropdown__panel--stacked]="stackedPanel"
+    role="listbox"
+  >
+    <button
+      type="button"
+      class="inline-dropdown__option"
+      *ngFor="let item of items"
+      [class.inline-dropdown__option--selected]="item.value === selectedValue"
+      (click)="select(item.value)"
+    >
+      <span class="inline-dropdown__option-label">{{ item.label }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="inline-dropdown__option inline-dropdown__option--action"
+      *ngFor="let action of actions"
+      [class.inline-dropdown__option--danger]="action.variant === 'danger'"
+      [disabled]="action.disabled"
+      [title]="action.title"
+      [attr.aria-label]="action.ariaLabel"
+      (click)="triggerAction(action.id)"
+    >
+      <svg *ngIf="action.icon === 'plus'" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
+      </svg>
+      <svg *ngIf="action.icon === 'trash'" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+          fill="currentColor"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
