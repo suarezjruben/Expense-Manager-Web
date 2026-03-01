@@ -294,9 +294,20 @@ th {
     align-items: center;
   }
 
-  /* Narrow the category action column and allow buttons to stack vertically. */
+  /* Tighten the portrait sort-order column to the requested compact width. */
+  .categories-table .col-order {
+    width: 3rem;
+  }
+
+  /* Tighten the portrait active column to the requested compact width. */
+  .categories-table .col-active {
+    width: 3rem;
+  }
+
+  /* Tighten the portrait actions column to the requested compact width. */
   .categories-table .col-actions {
-    width: 5.25rem;
+    width: 5rem;
+    text-align: center;
   }
 
   /* Keep icon-only row action buttons in a compact wrapped row on portrait mobile. */

@@ -92,13 +92,14 @@
       <div class="table-actions">
         <button
           type="button"
-          class="icon-button"
+          class="mobile-icon-button"
           [title]="isSavingPlanType('EXPENSE') ? 'Saving expense plans' : 'Save All Expense Plans'"
           [attr.aria-label]="isSavingPlanType('EXPENSE') ? 'Saving expense plans' : 'Save All Expense Plans'"
           (click)="savePlansAndStayOnTab('EXPENSE')"
           [disabled]="!hasPendingPlanChanges('EXPENSE') || hasInvalidPlanChanges('EXPENSE') || isSavingPlanType('EXPENSE') || isDeletingPlanType('EXPENSE')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isSavingPlanType('EXPENSE') ? 'Saving...' : 'Save All Plans' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
               fill="currentColor"
@@ -107,13 +108,14 @@
         </button>
         <button
           type="button"
-          class="icon-button danger"
+          class="danger mobile-icon-button"
           [title]="isDeletingPlanType('EXPENSE') ? 'Deleting expense plans' : 'Delete All Expense Plans'"
           [attr.aria-label]="isDeletingPlanType('EXPENSE') ? 'Deleting expense plans' : 'Delete All Expense Plans'"
           (click)="deleteAllPlans('EXPENSE')"
           [disabled]="!hasPlansToDelete('EXPENSE') || isSavingPlanType('EXPENSE') || isDeletingPlanType('EXPENSE')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isDeletingPlanType('EXPENSE') ? 'Deleting...' : 'Delete All Plans' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
               fill="currentColor"
@@ -153,13 +155,14 @@
       <div class="table-actions">
         <button
           type="button"
-          class="icon-button"
+          class="mobile-icon-button"
           [title]="isSavingPlanType('INCOME') ? 'Saving income plans' : 'Save All Income Plans'"
           [attr.aria-label]="isSavingPlanType('INCOME') ? 'Saving income plans' : 'Save All Income Plans'"
           (click)="savePlansAndStayOnTab('INCOME')"
           [disabled]="!hasPendingPlanChanges('INCOME') || hasInvalidPlanChanges('INCOME') || isSavingPlanType('INCOME') || isDeletingPlanType('INCOME')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isSavingPlanType('INCOME') ? 'Saving...' : 'Save All Plans' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
               fill="currentColor"
@@ -168,13 +171,14 @@
         </button>
         <button
           type="button"
-          class="icon-button danger"
+          class="danger mobile-icon-button"
           [title]="isDeletingPlanType('INCOME') ? 'Deleting income plans' : 'Delete All Income Plans'"
           [attr.aria-label]="isDeletingPlanType('INCOME') ? 'Deleting income plans' : 'Delete All Income Plans'"
           (click)="deleteAllPlans('INCOME')"
           [disabled]="!hasPlansToDelete('INCOME') || isSavingPlanType('INCOME') || isDeletingPlanType('INCOME')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isDeletingPlanType('INCOME') ? 'Deleting...' : 'Delete All Plans' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
               fill="currentColor"
@@ -266,13 +270,14 @@
       <div class="table-actions">
         <button
           type="button"
-          class="icon-button"
+          class="mobile-icon-button"
           [title]="isSavingCategoryType('EXPENSE') ? 'Saving expense categories' : 'Save All Expense Categories'"
           [attr.aria-label]="isSavingCategoryType('EXPENSE') ? 'Saving expense categories' : 'Save All Expense Categories'"
           (click)="saveAllCategories('EXPENSE')"
           [disabled]="!hasPendingCategoryChanges('EXPENSE') || hasInvalidCategoryChanges('EXPENSE') || isSavingCategoryType('EXPENSE') || isDeletingCategoryType('EXPENSE')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isSavingCategoryType('EXPENSE') ? 'Saving...' : 'Save All Categories' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
               fill="currentColor"
@@ -281,13 +286,14 @@
         </button>
         <button
           type="button"
-          class="icon-button danger"
+          class="danger mobile-icon-button"
           [title]="isDeletingCategoryType('EXPENSE') ? 'Deleting expense categories' : 'Delete All Expense Categories'"
           [attr.aria-label]="isDeletingCategoryType('EXPENSE') ? 'Deleting expense categories' : 'Delete All Expense Categories'"
           (click)="deleteAllCategories('EXPENSE')"
           [disabled]="!hasCategories('EXPENSE') || isSavingCategoryType('EXPENSE') || isDeletingCategoryType('EXPENSE')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isDeletingCategoryType('EXPENSE') ? 'Deleting...' : 'Delete All Categories' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
               fill="currentColor"
@@ -377,13 +383,14 @@
       <div class="table-actions">
         <button
           type="button"
-          class="icon-button"
+          class="mobile-icon-button"
           [title]="isSavingCategoryType('INCOME') ? 'Saving income categories' : 'Save All Income Categories'"
           [attr.aria-label]="isSavingCategoryType('INCOME') ? 'Saving income categories' : 'Save All Income Categories'"
           (click)="saveAllCategories('INCOME')"
           [disabled]="!hasPendingCategoryChanges('INCOME') || hasInvalidCategoryChanges('INCOME') || isSavingCategoryType('INCOME') || isDeletingCategoryType('INCOME')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isSavingCategoryType('INCOME') ? 'Saving...' : 'Save All Categories' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
               fill="currentColor"
@@ -392,13 +399,14 @@
         </button>
         <button
           type="button"
-          class="icon-button danger"
+          class="danger mobile-icon-button"
           [title]="isDeletingCategoryType('INCOME') ? 'Deleting income categories' : 'Delete All Income Categories'"
           [attr.aria-label]="isDeletingCategoryType('INCOME') ? 'Deleting income categories' : 'Delete All Income Categories'"
           (click)="deleteAllCategories('INCOME')"
           [disabled]="!hasCategories('INCOME') || isSavingCategoryType('INCOME') || isDeletingCategoryType('INCOME')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <span class="mobile-icon-button__label">{{ isDeletingCategoryType('INCOME') ? 'Deleting...' : 'Delete All Categories' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
               fill="currentColor"
