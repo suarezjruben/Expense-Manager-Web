@@ -198,10 +198,73 @@ table {
   background: #fff;
 }
 
-/* Fixed-layout transaction table so colgroup widths drive the column sizes. */
+/* Fixed-layout transaction table so header widths drive the column sizes. */
 .transactions-table {
   width: 100%;
   table-layout: fixed;
+}
+
+/* Default desktop width for transaction table date columns. */
+.col-date {
+  width: 5rem;
+}
+
+/* Default desktop width for transaction table amount columns. */
+.col-amount {
+  width: 5rem;
+}
+
+/* Default desktop width for transaction table category columns. */
+.col-category {
+  width: 20%;
+}
+
+/* Default desktop width for transaction table actions columns. */
+.col-actions {
+  width: 5rem;
+}
+
+/* Hide the mobile-only detail row until a mobile breakpoint enables it. */
+.transaction-detail-row {
+  display: none;
+}
+
+/* Remove default cell padding from the expanded mobile detail row wrapper. */
+.transaction-detail-cell {
+  padding: 0;
+}
+
+/* Stack extra transaction details vertically inside the mobile detail row. */
+.transaction-detail-grid {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  background: #f8fcfd;
+}
+
+/* Stack each label/value pair inside the transaction detail row. */
+.transaction-detail-item {
+  display: grid;
+  gap: 0.3rem;
+}
+
+/* Style labels for the mobile transaction detail fields. */
+.transaction-detail-label {
+  color: #4c6b79;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Allow long transaction detail text to wrap instead of overflowing. */
+.transaction-detail-value {
+  overflow-wrap: anywhere;
+}
+
+/* Stretch mobile detail-row selects to the full available width. */
+.transaction-detail-item select {
+  width: 100%;
 }
 
 /* Shared cell styling for transaction table headers and body cells. */
@@ -226,7 +289,6 @@ th {
 /* Make inline category selects fill their table cell on desktop/tablet. */
 .category-cell select {
   width: 100%;
-  min-width: 7rem;
 }
 
 /* Keep the actions cell vertically aligned with the rest of the row. */
@@ -296,8 +358,56 @@ th {
   color: #b91c1c;
 }
 
+/* Mobile icon-button overrides that only apply inside the transactions page. */
+@media (max-width: 860px) {
+  /* Prevent transaction-page icon buttons from stretching across their rows. */
+  .account-create .mobile-icon-button,
+  .import-form .mobile-icon-button,
+  .form-footer .mobile-icon-button,
+  .table-actions .mobile-icon-button {
+    flex: 0 0 auto;
+  }
+}
+
 /* Responsive transactions-page layout changes for screens 1000px and smaller. */
 @media (max-width: 1000px) {
+  /* Hide the desktop description column when the detail row takes over. */
+  .col-description,
+  .description-cell {
+    display: none;
+  }
+
+  /* Give the visible portrait/mobile date column one-third of table width. */
+  .col-date {
+    width: 33.333333%;
+  }
+
+  /* Give the visible portrait/mobile amount column one-third of table width. */
+  .col-amount {
+    width: 33.333333%;
+  }
+
+  /* Give the visible portrait/mobile actions column one-third of table width. */
+  .col-actions {
+    width: 33.333333%;
+  }
+
+  /* Merge the main transaction row visually into the detail row below it. */
+  .transaction-main-row td {
+    border-bottom: none;
+  }
+
+  /* Show the extra detail row for each transaction on mobile/tablet widths. */
+  .transaction-detail-row {
+    display: table-row;
+  }
+
+  /* Restore the bottom border on the full-width mobile detail row cell. */
+  .transaction-detail-cell {
+    padding: 0;
+    border-bottom: 1px solid #e8eff1;
+  }
+
   /* Stack the page toolbar vertically on narrower screens. */
   .toolbar {
     flex-direction: column;
@@ -368,4 +478,55 @@ th {
     height: 0.9rem;
   }
 
+}
+
+/* Landscape-only mobile/tablet transaction layout with category back in-row. */
+@media (max-width: 1000px) and (orientation: landscape) {
+  /* Show the desktop category header/cell again in landscape mode. */
+  .transactions-table .col-category,
+  .transactions-table .category-cell {
+    display: table-cell;
+  }
+
+  /* Give the landscape date column one-quarter of the visible row width. */
+  .col-date {
+    width: 25%;
+  }
+
+  /* Give the landscape amount column one-quarter of the visible row width. */
+  .col-amount {
+    width: 25%;
+  }
+
+  /* Give the landscape category column one-quarter of the visible row width. */
+  .col-category {
+    width: 25%;
+  }
+
+  /* Give the landscape actions column one-quarter of the visible row width. */
+  .col-actions {
+    text-align: center;
+    width: 25%;
+  }
+
+  /* Let the inline category select fully occupy the restored category column. */
+  .transactions-table .category-cell select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Hide category from the detail row once it is visible in the main row again. */
+  .transaction-detail-item--category {
+    display: none;
+  }
+}
+
+/* Portrait-only mobile/tablet transaction layout with category in the detail row. */
+@media (max-width: 1000px) and (orientation: portrait) {
+  /* Hide the category header/cell from the main table row in portrait mode. */
+  .transactions-table .col-category,
+  .transactions-table .category-cell {
+    display: none;
+  }
 }
