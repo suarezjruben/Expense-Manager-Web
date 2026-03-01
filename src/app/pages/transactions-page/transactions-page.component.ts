@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
 import { ApiService } from '../../core/api.service';
@@ -29,6 +29,8 @@ interface CsvHeaderMappingForm {
   externalIdColumnIndex: number | null;
   saveHeaderMapping: boolean;
 }
+
+type CategoryDialogSource = 'FORM' | 'TRANSACTION';
 
 @Component({
   selector: 'app-transactions-page',
@@ -78,6 +80,9 @@ export class TransactionsPageComponent implements OnInit {
   showIncomeDialog = false;
   showCategoryDialog = false;
   categoryDialogType: TransactionType | null = null;
+  categoryDialogSource: CategoryDialogSource = 'FORM';
+  categoryDialogTransactionId: number | null = null;
+  categoryDialogPreviousSelection: number | null = null;
   activeMobileTransactionTab: TransactionType = 'EXPENSE';
 
   expenseForm: NewTransactionForm = this.createDefaultForm();
@@ -85,7 +90,8 @@ export class TransactionsPageComponent implements OnInit {
 
   constructor(
     private readonly api: ApiService,
-    private readonly monthState: MonthStateService
+    private readonly monthState: MonthStateService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {
     this.month = this.monthState.month;
   }
@@ -130,10 +136,14 @@ export class TransactionsPageComponent implements OnInit {
     this.load();
   }
 
-  onAccountChanged(): void {
+  onAccountChanged(select?: HTMLSelectElement): void {
     if (this.accountSelection === this.addAccountOptionValue) {
-      this.accountSelection = this.selectedAccountId;
-      this.openAccountDialog();
+      const previousSelection = this.selectedAccountId;
+      this.accountSelection = previousSelection;
+      this.restoreAccountSelectElement(select, previousSelection);
+      this.openDialogNextTick(() => {
+        this.openAccountDialog();
+      });
       return;
     }
 
@@ -207,9 +217,14 @@ export class TransactionsPageComponent implements OnInit {
     this.incomeCategoryError = '';
   }
 
-  onDialogCategorySelectionChanged(type: TransactionType, value: number | string | null): void {
+  onDialogCategorySelectionChanged(type: TransactionType, value: number | string | null, select?: HTMLSelectElement): void {
     if (value === this.addCategoryOptionValue) {
-      this.openCategoryDialog(type);
+      const previousSelection = this.getCategoryDialogSelection(type, 'FORM');
+      this.restoreDialogFormSelection(type, previousSelection);
+      this.restoreCategorySelectElement(type, 'FORM', select, previousSelection);
+      this.openDialogNextTick(() => {
+        this.openCategoryDialog(type, 'FORM');
+      });
       return;
     }
 
@@ -227,9 +242,12 @@ export class TransactionsPageComponent implements OnInit {
     this.incomeForm.categoryId = typeof value === 'number' ? value : null;
   }
 
-  openCategoryDialog(type: TransactionType): void {
+  openCategoryDialog(type: TransactionType, source: CategoryDialogSource, transactionId?: number): void {
     this.showCategoryDialog = true;
     this.categoryDialogType = type;
+    this.categoryDialogSource = source;
+    this.categoryDialogTransactionId = transactionId ?? null;
+    this.categoryDialogPreviousSelection = this.getCategoryDialogSelection(type, source, transactionId);
 
     if (type === 'EXPENSE') {
       this.expenseCategoryDraft = '';
@@ -241,7 +259,11 @@ export class TransactionsPageComponent implements OnInit {
     this.incomeCategoryError = '';
   }
 
-  closeCategoryDialog(): void {
+  closeCategoryDialog(restorePreviousSelection = true): void {
+    if (restorePreviousSelection && this.categoryDialogType) {
+      this.restoreCategoryDialogSelection();
+    }
+
     if (this.categoryDialogType === 'EXPENSE') {
       this.expenseCategoryDraft = '';
       this.expenseCategoryError = '';
@@ -254,6 +276,9 @@ export class TransactionsPageComponent implements OnInit {
 
     this.showCategoryDialog = false;
     this.categoryDialogType = null;
+    this.categoryDialogSource = 'FORM';
+    this.categoryDialogTransactionId = null;
+    this.categoryDialogPreviousSelection = null;
   }
 
   createCategoryFromDialog(type: TransactionType): void {
@@ -269,8 +294,8 @@ export class TransactionsPageComponent implements OnInit {
 
     const existingCategory = this.findCategoryByName(type, name);
     if (existingCategory) {
-      this.selectDialogCategory(type, existingCategory.id);
-      this.closeCategoryDialog();
+      this.applyCreatedCategorySelection(type, existingCategory.id);
+      this.closeCategoryDialog(false);
       return;
     }
 
@@ -286,14 +311,14 @@ export class TransactionsPageComponent implements OnInit {
       next: (category) => {
         if (type === 'EXPENSE') {
           this.expenseCategories = this.sortCategories([...this.expenseCategories, category]);
-          this.selectDialogCategory(type, category.id);
-          this.closeCategoryDialog();
+          this.applyCreatedCategorySelection(type, category.id);
+          this.closeCategoryDialog(false);
           return;
         }
 
         this.incomeCategories = this.sortCategories([...this.incomeCategories, category]);
-        this.selectDialogCategory(type, category.id);
-        this.closeCategoryDialog();
+        this.applyCreatedCategorySelection(type, category.id);
+        this.closeCategoryDialog(false);
       },
       error: (error) => {
         const message = this.toMessage(error);
@@ -342,7 +367,29 @@ export class TransactionsPageComponent implements OnInit {
     });
   }
 
-  onTransactionCategoryChanged(type: TransactionType, transactionId: number, categoryId: number): void {
+  onTransactionCategoryChanged(
+    type: TransactionType,
+    transactionId: number,
+    categoryId: number | string | null,
+    select?: HTMLSelectElement
+  ): void {
+    if (categoryId === this.addCategoryOptionValue) {
+      const transaction = (type === 'EXPENSE' ? this.expenses : this.incomes).find((item) => item.id === transactionId);
+      const previousSelection = transaction ? this.getSelectedCategoryId(type, transaction) : null;
+      if (previousSelection != null) {
+        this.selectTransactionCategory(type, transactionId, previousSelection);
+      }
+      this.restoreCategorySelectElement(type, 'TRANSACTION', select, previousSelection);
+      this.openDialogNextTick(() => {
+        this.openCategoryDialog(type, 'TRANSACTION', transactionId);
+      });
+      return;
+    }
+
+    if (typeof categoryId !== 'number') {
+      return;
+    }
+
     if (type === 'EXPENSE') {
       this.expenseCategoryByTransactionId[transactionId] = categoryId;
       return;
@@ -755,6 +802,121 @@ export class TransactionsPageComponent implements OnInit {
     this.incomeForm.categoryId = categoryId;
     this.incomeCategoryDraft = category?.name ?? '';
     this.incomeCategoryError = '';
+  }
+
+  private selectTransactionCategory(type: TransactionType, transactionId: number, categoryId: number): void {
+    if (type === 'EXPENSE') {
+      this.expenseCategoryByTransactionId[transactionId] = categoryId;
+      return;
+    }
+
+    this.incomeCategoryByTransactionId[transactionId] = categoryId;
+  }
+
+  private applyCreatedCategorySelection(type: TransactionType, categoryId: number): void {
+    if (this.categoryDialogSource === 'TRANSACTION' && this.categoryDialogTransactionId != null) {
+      this.selectTransactionCategory(type, this.categoryDialogTransactionId, categoryId);
+      return;
+    }
+
+    this.selectDialogCategory(type, categoryId);
+  }
+
+  private getCategoryDialogSelection(
+    type: TransactionType,
+    source: CategoryDialogSource,
+    transactionId?: number
+  ): number | null {
+    if (source === 'TRANSACTION' && transactionId != null) {
+      const transaction = (type === 'EXPENSE' ? this.expenses : this.incomes).find((item) => item.id === transactionId);
+      return transaction ? this.getSelectedCategoryId(type, transaction) : null;
+    }
+
+    return type === 'EXPENSE' ? this.expenseForm.categoryId : this.incomeForm.categoryId;
+  }
+
+  private restoreCategoryDialogSelection(): void {
+    const type = this.categoryDialogType;
+    if (!type) {
+      return;
+    }
+
+    const previousSelection = this.categoryDialogPreviousSelection;
+    if (this.categoryDialogSource === 'TRANSACTION' && this.categoryDialogTransactionId != null) {
+      if (previousSelection != null) {
+        this.selectTransactionCategory(type, this.categoryDialogTransactionId, previousSelection);
+      }
+      return;
+    }
+
+    if (previousSelection != null) {
+      this.selectDialogCategory(type, previousSelection);
+      return;
+    }
+
+    if (type === 'EXPENSE') {
+      this.expenseCategorySelection = null;
+      this.expenseForm.categoryId = null;
+      return;
+    }
+
+    this.incomeCategorySelection = null;
+    this.incomeForm.categoryId = null;
+  }
+
+  private restoreDialogFormSelection(type: TransactionType, categoryId: number | null): void {
+    if (categoryId != null) {
+      this.selectDialogCategory(type, categoryId);
+      return;
+    }
+
+    if (type === 'EXPENSE') {
+      this.expenseCategorySelection = null;
+      this.expenseForm.categoryId = null;
+      return;
+    }
+
+    this.incomeCategorySelection = null;
+    this.incomeForm.categoryId = null;
+  }
+
+  private openDialogNextTick(openDialog: () => void): void {
+    this.changeDetectorRef.detectChanges();
+    setTimeout(openDialog, 0);
+  }
+
+  private restoreAccountSelectElement(select: HTMLSelectElement | undefined, accountId: number | null): void {
+    if (!select) {
+      return;
+    }
+
+    const optionIndex = accountId == null ? 0 : this.accounts.findIndex((account) => account.id === accountId) + 1;
+    if (optionIndex >= 0) {
+      select.selectedIndex = optionIndex;
+    }
+  }
+
+  private restoreCategorySelectElement(
+    type: TransactionType,
+    source: CategoryDialogSource,
+    select: HTMLSelectElement | undefined,
+    categoryId: number | null
+  ): void {
+    if (!select) {
+      return;
+    }
+
+    const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
+    const categoryIndex = categoryId == null ? -1 : categories.findIndex((category) => category.id === categoryId);
+
+    if (source === 'FORM') {
+      select.selectedIndex = categoryIndex >= 0 ? categoryIndex + 1 : 0;
+      return;
+    }
+
+    if (categoryIndex >= 0) {
+      select.selectedIndex = categoryIndex;
+    }
   }
 
   private toMessage(error: unknown): string {

@@ -8,10 +8,10 @@
       </label>
       <label>
         Account
-        <select [(ngModel)]="accountSelection" (change)="onAccountChanged()">
+        <select #accountSelect [(ngModel)]="accountSelection" (change)="onAccountChanged(accountSelect)">
           <option [ngValue]="null" disabled>Select account</option>
           <option *ngFor="let account of accounts" [ngValue]="account.id">{{ account.name }}</option>
-          <option [ngValue]="addAccountOptionValue">+ Add New</option>
+          <option [ngValue]="addAccountOptionValue">  +</option>
         </select>
       </label>
     </div>
@@ -148,11 +148,13 @@
                 <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
                 <td class="category-cell">
                   <select
+                    #expenseRowCategorySelect
                     [ngModel]="expenseCategoryByTransactionId[txn.id]"
                     [ngModelOptions]="{ standalone: true }"
-                    (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event)"
+                    (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event, expenseRowCategorySelect)"
                   >
                     <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
+                    <option [ngValue]="addCategoryOptionValue">+</option>
                   </select>
                 </td>
                 <td class="actions-cell">
@@ -200,11 +202,13 @@
                     <div class="transaction-detail-item transaction-detail-item--category">
                       <span class="transaction-detail-label">Category</span>
                       <select
+                        #expenseDetailCategorySelect
                         [ngModel]="expenseCategoryByTransactionId[txn.id]"
                         [ngModelOptions]="{ standalone: true }"
-                        (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event)"
+                        (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event, expenseDetailCategorySelect)"
                       >
                         <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
+                        <option [ngValue]="addCategoryOptionValue">+</option>
                       </select>
                     </div>
                   </div>
@@ -297,11 +301,13 @@
                 <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
                 <td class="category-cell">
                   <select
+                    #incomeRowCategorySelect
                     [ngModel]="incomeCategoryByTransactionId[txn.id]"
                     [ngModelOptions]="{ standalone: true }"
-                    (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event)"
+                    (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event, incomeRowCategorySelect)"
                   >
                     <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
+                    <option [ngValue]="addCategoryOptionValue">+</option>
                   </select>
                 </td>
                 <td class="actions-cell">
@@ -349,11 +355,13 @@
                     <div class="transaction-detail-item transaction-detail-item--category">
                       <span class="transaction-detail-label">Category</span>
                       <select
+                        #incomeDetailCategorySelect
                         [ngModel]="incomeCategoryByTransactionId[txn.id]"
                         [ngModelOptions]="{ standalone: true }"
-                        (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event)"
+                        (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event, incomeDetailCategorySelect)"
                       >
                         <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
+                        <option [ngValue]="addCategoryOptionValue">+</option>
                       </select>
                     </div>
                   </div>
@@ -538,14 +546,15 @@
         <label>
           Category
           <select
+            #expenseDialogCategorySelect
             name="expenseCategory"
             [ngModel]="expenseCategorySelection"
-            (ngModelChange)="onDialogCategorySelectionChanged('EXPENSE', $event)"
+            (ngModelChange)="onDialogCategorySelectionChanged('EXPENSE', $event, expenseDialogCategorySelect)"
             required
           >
             <option [ngValue]="null" disabled>Select category</option>
             <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
-            <option [ngValue]="addCategoryOptionValue">+ Add New</option>
+            <option [ngValue]="addCategoryOptionValue">+</option>
           </select>
         </label>
 
@@ -586,14 +595,15 @@
         <label>
           Category
           <select
+            #incomeDialogCategorySelect
             name="incomeCategory"
             [ngModel]="incomeCategorySelection"
-            (ngModelChange)="onDialogCategorySelectionChanged('INCOME', $event)"
+            (ngModelChange)="onDialogCategorySelectionChanged('INCOME', $event, incomeDialogCategorySelect)"
             required
           >
             <option [ngValue]="null" disabled>Select category</option>
             <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
-            <option [ngValue]="addCategoryOptionValue">+ Add New</option>
+            <option [ngValue]="addCategoryOptionValue">+</option>
           </select>
         </label>
 
