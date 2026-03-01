@@ -38,12 +38,17 @@ interface CsvHeaderMappingForm {
   styleUrl: './transactions-page.component.scss'
 })
 export class TransactionsPageComponent implements OnInit {
+  readonly addAccountOptionValue = '__ADD_ACCOUNT__';
+  readonly addCategoryOptionValue = '__ADD_CATEGORY__';
+
   month: string;
   loading = false;
   uploading = false;
   error = '';
+  accountDialogError = '';
 
   accounts: AccountDto[] = [];
+  accountSelection: number | string | null = null;
   selectedAccountId: number | null = null;
   newAccountName = '';
   selectedStatementFile: File | null = null;
@@ -54,6 +59,12 @@ export class TransactionsPageComponent implements OnInit {
 
   expenseCategories: CategoryDto[] = [];
   incomeCategories: CategoryDto[] = [];
+  expenseCategorySelection: number | string | null = null;
+  incomeCategorySelection: number | string | null = null;
+  expenseCategoryDraft = '';
+  incomeCategoryDraft = '';
+  expenseCategoryError = '';
+  incomeCategoryError = '';
   expenses: TransactionDto[] = [];
   incomes: TransactionDto[] = [];
   expenseCategoryByTransactionId: Record<number, number> = {};
@@ -61,6 +72,12 @@ export class TransactionsPageComponent implements OnInit {
   savingTransactionKeys = new Set<string>();
   savingTypes = new Set<TransactionType>();
   deletingTypes = new Set<TransactionType>();
+  showAccountDialog = false;
+  showUploadDialog = false;
+  showExpenseDialog = false;
+  showIncomeDialog = false;
+  showCategoryDialog = false;
+  categoryDialogType: TransactionType | null = null;
 
   expenseForm: NewTransactionForm = this.createDefaultForm();
   incomeForm: NewTransactionForm = this.createDefaultForm();
@@ -85,6 +102,7 @@ export class TransactionsPageComponent implements OnInit {
         this.accounts = accounts.filter((account) => account.active);
         if (!this.accounts.length) {
           this.error = 'No active accounts available';
+          this.accountSelection = null;
           this.expenses = [];
           this.incomes = [];
           this.loading = false;
@@ -94,6 +112,7 @@ export class TransactionsPageComponent implements OnInit {
         if (this.selectedAccountId == null || !this.accounts.some((account) => account.id === this.selectedAccountId)) {
           this.selectedAccountId = this.accounts[0].id;
         }
+        this.accountSelection = this.selectedAccountId;
 
         this.loadTransactionsForSelectedAccount();
       },
@@ -111,6 +130,13 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   onAccountChanged(): void {
+    if (this.accountSelection === this.addAccountOptionValue) {
+      this.accountSelection = this.selectedAccountId;
+      this.openAccountDialog();
+      return;
+    }
+
+    this.selectedAccountId = typeof this.accountSelection === 'number' ? this.accountSelection : null;
     this.load();
   }
 
@@ -120,6 +146,155 @@ export class TransactionsPageComponent implements OnInit {
 
   addIncome(): void {
     this.addTransaction('INCOME', this.incomeForm);
+  }
+
+  openAccountDialog(): void {
+    this.showAccountDialog = true;
+    this.newAccountName = '';
+    this.accountDialogError = '';
+  }
+
+  closeAccountDialog(): void {
+    this.showAccountDialog = false;
+    this.newAccountName = '';
+    this.accountDialogError = '';
+    this.accountSelection = this.selectedAccountId;
+  }
+
+  openUploadDialog(): void {
+    this.showUploadDialog = true;
+    this.error = '';
+  }
+
+  closeUploadDialog(): void {
+    this.showUploadDialog = false;
+    this.error = '';
+    this.resetUploadDialogState();
+  }
+
+  openExpenseDialog(): void {
+    this.showExpenseDialog = true;
+    this.error = '';
+    this.syncDialogCategoryState('EXPENSE');
+  }
+
+  closeExpenseDialog(): void {
+    this.showExpenseDialog = false;
+    this.closeCategoryDialog();
+    this.error = '';
+    this.expenseCategoryError = '';
+  }
+
+  openIncomeDialog(): void {
+    this.showIncomeDialog = true;
+    this.error = '';
+    this.syncDialogCategoryState('INCOME');
+  }
+
+  closeIncomeDialog(): void {
+    this.showIncomeDialog = false;
+    this.closeCategoryDialog();
+    this.error = '';
+    this.incomeCategoryError = '';
+  }
+
+  onDialogCategorySelectionChanged(type: TransactionType, value: number | string | null): void {
+    if (value === this.addCategoryOptionValue) {
+      this.openCategoryDialog(type);
+      return;
+    }
+
+    if (type === 'EXPENSE') {
+      this.expenseCategorySelection = value;
+      this.expenseCategoryError = '';
+      this.expenseCategoryDraft = '';
+      this.expenseForm.categoryId = typeof value === 'number' ? value : null;
+      return;
+    }
+
+    this.incomeCategorySelection = value;
+    this.incomeCategoryError = '';
+    this.incomeCategoryDraft = '';
+    this.incomeForm.categoryId = typeof value === 'number' ? value : null;
+  }
+
+  openCategoryDialog(type: TransactionType): void {
+    this.showCategoryDialog = true;
+    this.categoryDialogType = type;
+
+    if (type === 'EXPENSE') {
+      this.expenseCategoryDraft = '';
+      this.expenseCategoryError = '';
+      return;
+    }
+
+    this.incomeCategoryDraft = '';
+    this.incomeCategoryError = '';
+  }
+
+  closeCategoryDialog(): void {
+    if (this.categoryDialogType === 'EXPENSE') {
+      this.expenseCategoryDraft = '';
+      this.expenseCategoryError = '';
+    }
+
+    if (this.categoryDialogType === 'INCOME') {
+      this.incomeCategoryDraft = '';
+      this.incomeCategoryError = '';
+    }
+
+    this.showCategoryDialog = false;
+    this.categoryDialogType = null;
+  }
+
+  createCategoryFromDialog(type: TransactionType): void {
+    const name = (type === 'EXPENSE' ? this.expenseCategoryDraft : this.incomeCategoryDraft).trim();
+    if (!name) {
+      if (type === 'EXPENSE') {
+        this.expenseCategoryError = 'Category name is required.';
+      } else {
+        this.incomeCategoryError = 'Category name is required.';
+      }
+      return;
+    }
+
+    const existingCategory = this.findCategoryByName(type, name);
+    if (existingCategory) {
+      this.selectDialogCategory(type, existingCategory.id);
+      this.closeCategoryDialog();
+      return;
+    }
+
+    const target = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
+    const sortOrder = target.length + 1;
+
+    this.api.createCategory({
+      name,
+      type,
+      sortOrder,
+      active: true
+    }).subscribe({
+      next: (category) => {
+        if (type === 'EXPENSE') {
+          this.expenseCategories = this.sortCategories([...this.expenseCategories, category]);
+          this.selectDialogCategory(type, category.id);
+          this.closeCategoryDialog();
+          return;
+        }
+
+        this.incomeCategories = this.sortCategories([...this.incomeCategories, category]);
+        this.selectDialogCategory(type, category.id);
+        this.closeCategoryDialog();
+      },
+      error: (error) => {
+        const message = this.toMessage(error);
+        if (type === 'EXPENSE') {
+          this.expenseCategoryError = message;
+        } else {
+          this.incomeCategoryError = message;
+        }
+      }
+    });
   }
 
   get expenseTotal(): number {
@@ -306,17 +481,20 @@ export class TransactionsPageComponent implements OnInit {
   addAccount(): void {
     const name = this.newAccountName.trim();
     if (!name) {
-      this.error = 'Account name is required';
+      this.accountDialogError = 'Account name is required';
       return;
     }
 
+    this.accountDialogError = '';
     this.api.createAccount({ name }).subscribe({
       next: (account) => {
         this.newAccountName = '';
         this.selectedAccountId = account.id;
+        this.accountSelection = account.id;
+        this.showAccountDialog = false;
         this.load();
       },
-      error: (error) => (this.error = this.toMessage(error))
+      error: (error) => (this.accountDialogError = this.toMessage(error))
     });
   }
 
@@ -359,10 +537,8 @@ export class TransactionsPageComponent implements OnInit {
         }
 
         this.importSummary = response.summary;
-        this.headerMappingPrompt = null;
-        this.headerMappingForm = this.createHeaderMappingForm();
-        this.selectedStatementFile = null;
-        this.selectedStatementFileName = '';
+        this.showUploadDialog = false;
+        this.resetUploadDialogState();
         fileInput.value = '';
         this.load();
       },
@@ -394,8 +570,12 @@ export class TransactionsPageComponent implements OnInit {
           this.load();
           if (type === 'EXPENSE') {
             this.expenseForm = this.createDefaultForm(this.expenseForm.date);
+            this.syncDialogCategoryState('EXPENSE');
+            this.showExpenseDialog = false;
           } else {
             this.incomeForm = this.createDefaultForm(this.incomeForm.date);
+            this.syncDialogCategoryState('INCOME');
+            this.showIncomeDialog = false;
           }
         },
         error: (error) => (this.error = this.toMessage(error))
@@ -500,10 +680,31 @@ export class TransactionsPageComponent implements OnInit {
     return `${type}:${transactionId}`;
   }
 
+  private resetUploadDialogState(): void {
+    this.selectedStatementFile = null;
+    this.selectedStatementFileName = '';
+    this.headerMappingPrompt = null;
+    this.headerMappingForm = this.createHeaderMappingForm();
+  }
+
   private syncFormDates(): void {
     const firstDay = `${this.month}-01`;
     this.expenseForm.date = firstDay;
     this.incomeForm.date = firstDay;
+  }
+
+
+  private syncDialogCategoryState(type: TransactionType): void {
+    if (type === 'EXPENSE') {
+      this.expenseCategorySelection = this.expenseForm.categoryId;
+      this.expenseCategoryDraft = '';
+      this.expenseCategoryError = '';
+      return;
+    }
+
+    this.incomeCategorySelection = this.incomeForm.categoryId;
+    this.incomeCategoryDraft = '';
+    this.incomeCategoryError = '';
   }
 
   private createDefaultForm(date = ''): NewTransactionForm {
@@ -513,6 +714,38 @@ export class TransactionsPageComponent implements OnInit {
       description: '',
       categoryId: null
     };
+  }
+
+  private sortCategories(categories: CategoryDto[]): CategoryDto[] {
+    return [...categories].sort((left, right) => left.sortOrder - right.sortOrder || left.name.localeCompare(right.name));
+  }
+
+  private findCategoryByName(type: TransactionType, value: string): CategoryDto | undefined {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) {
+      return undefined;
+    }
+
+    const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
+    return categories.find((category) => category.name.trim().toLowerCase() === normalized);
+  }
+
+  private selectDialogCategory(type: TransactionType, categoryId: number): void {
+    const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
+    const category = categories.find((item) => item.id === categoryId);
+
+    if (type === 'EXPENSE') {
+      this.expenseCategorySelection = categoryId;
+      this.expenseForm.categoryId = categoryId;
+      this.expenseCategoryDraft = category?.name ?? '';
+      this.expenseCategoryError = '';
+      return;
+    }
+
+    this.incomeCategorySelection = categoryId;
+    this.incomeForm.categoryId = categoryId;
+    this.incomeCategoryDraft = category?.name ?? '';
+    this.incomeCategoryError = '';
   }
 
   private toMessage(error: unknown): string {

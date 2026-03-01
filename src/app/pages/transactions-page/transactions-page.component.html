@@ -8,96 +8,39 @@
       </label>
       <label>
         Account
-        <select [(ngModel)]="selectedAccountId" (change)="onAccountChanged()">
+        <select [(ngModel)]="accountSelection" (change)="onAccountChanged()">
+          <option [ngValue]="null" disabled>Select account</option>
           <option *ngFor="let account of accounts" [ngValue]="account.id">{{ account.name }}</option>
+          <option [ngValue]="addAccountOptionValue">+ Add New</option>
         </select>
       </label>
     </div>
   </div>
 
-  <div class="account-create">
-    <input
-      name="newAccount"
-      type="text"
-      [(ngModel)]="newAccountName"
-      placeholder="Add account name"
-      maxlength="120"
-    />
-    <button type="button" class="mobile-icon-button" title="Add Account" aria-label="Add Account" (click)="addAccount()">
-      <span class="mobile-icon-button__label">Add Account</span>
-      <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
-      </svg>
-    </button>
-  </div>
-
   <article class="import-panel">
-    <h2>Statement Upload</h2>
-    <div class="import-form">
-      <input
-        #statementFileInput
-        type="file"
-        accept=".csv"
-        (change)="onStatementFileChanged($event)"
-      />
-      <button
-        type="button"
-        class="mobile-icon-button"
-        [title]="uploading ? 'Importing statement' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement')"
-        [attr.aria-label]="uploading ? 'Importing statement' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement')"
-        (click)="uploadStatement(statementFileInput)"
-        [disabled]="uploading || !selectedAccountId"
-      >
-        <span class="mobile-icon-button__label">
-          {{ uploading ? 'Importing...' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement') }}
-        </span>
-        <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M12 3l4 4h-3v7h-2V7H8l4-4zm-7 13h14v5H5v-5z"
-            fill="currentColor"
-          />
-        </svg>
-      </button>
-    </div>
-    <p class="muted" *ngIf="selectedStatementFileName">Selected: {{ selectedStatementFileName }}</p>
-
-    <div class="mapping-panel" *ngIf="headerMappingPrompt as prompt">
-      <h3>CSV Header Mapping Needed</h3>
-      <p class="muted">{{ prompt.message }}</p>
-      <p class="muted">
-        Sample row:
-        <span *ngFor="let value of prompt.sampleRow; let i = index" class="chip">[{{ i }}] {{ value || '(empty)' }}</span>
-      </p>
-
-      <div class="mapping-grid">
-        <label>
-          Date Column Index
-          <input type="number" min="0" [(ngModel)]="headerMappingForm.dateColumnIndex" />
-        </label>
-        <label>
-          Amount Column Index
-          <input type="number" min="0" [(ngModel)]="headerMappingForm.amountColumnIndex" />
-        </label>
-        <label>
-          Description Column Index
-          <input type="number" min="0" [(ngModel)]="headerMappingForm.descriptionColumnIndex" />
-        </label>
-        <label>
-          Category Column Index (optional)
-          <input type="number" min="0" [(ngModel)]="headerMappingForm.categoryColumnIndex" />
-        </label>
-        <label>
-          External Id Column Index (optional)
-          <input type="number" min="0" [(ngModel)]="headerMappingForm.externalIdColumnIndex" />
-        </label>
+    <div class="section-bar section-bar--dialog">
+      <div class="section-bar__content">
+        <h2 class="section-heading">Statement Upload</h2>
+        <p class="muted">Upload a CSV statement for <strong>{{ selectedAccountName }}</strong>.</p>
       </div>
-
-      <label class="checkbox">
-        <input type="checkbox" [(ngModel)]="headerMappingForm.saveHeaderMapping" />
-        Save this CSV mapping for selected account
-      </label>
+      <div class="section-bar__actions">
+        <button
+          type="button"
+          class="mobile-icon-button"
+          title="Open Statement Upload Form"
+          aria-label="Open Statement Upload Form"
+          (click)="openUploadDialog()"
+        >
+          <span class="mobile-icon-button__label">Upload Statement</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 3l4 4h-3v7h-2V7H8l4-4zm-7 13h14v5H5v-5z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
-
     <div class="import-summary" *ngIf="importSummary as summary">
       <div class="summary-kpis">
         <p><strong>Batch</strong> #{{ summary.importBatchId }}</p>
@@ -132,27 +75,26 @@
 
   <div class="grid">
     <article>
-      <h2 class="section-heading">
-        Add <span class="account-accent">{{ selectedAccountName }}</span> Account Expense
-      </h2>
-      <form (ngSubmit)="addExpense()" #expenseFormRef="ngForm">
-        <input name="expenseDate" type="date" [(ngModel)]="expenseForm.date" required />
-        <input name="expenseAmount" type="number" step="0.01" min="0.01" [(ngModel)]="expenseForm.amount" required />
-        <input name="expenseDesc" type="text" [(ngModel)]="expenseForm.description" placeholder="Description" required />
-        <select name="expenseCategory" [(ngModel)]="expenseForm.categoryId" required>
-          <option [ngValue]="null">Select category</option>
-          <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
-        </select>
-        <div class="form-footer">
-          <button type="submit" class="mobile-icon-button" title="Add Expense" aria-label="Add Expense" [disabled]="expenseFormRef.invalid">
+      <div class="section-bar section-bar--dialog">
+        <h2 class="section-heading">
+          <span class="account-accent">{{ selectedAccountName }}</span> Account Expenses
+        </h2>
+        <div class="section-bar__actions">
+          <button
+            type="button"
+            class="mobile-icon-button"
+            title="Open Expense Form"
+            aria-label="Open Expense Form"
+            (click)="openExpenseDialog()"
+          >
             <span class="mobile-icon-button__label">Add Expense</span>
             <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
             </svg>
           </button>
-          <p class="form-total"><strong>Total:</strong> {{ expenseTotal | currency }}</p>
         </div>
-      </form>
+      </div>
+      <p class="form-total"><strong>Total:</strong> {{ expenseTotal | currency }}</p>
       <div class="table-wrap">
         <table class="transactions-table">
           <thead>
@@ -275,27 +217,26 @@
     </article>
 
     <article>
-      <h2 class="section-heading">
-        Add <span class="account-accent">{{ selectedAccountName }}</span> Account Income
-      </h2>
-      <form (ngSubmit)="addIncome()" #incomeFormRef="ngForm">
-        <input name="incomeDate" type="date" [(ngModel)]="incomeForm.date" required />
-        <input name="incomeAmount" type="number" step="0.01" min="0.01" [(ngModel)]="incomeForm.amount" required />
-        <input name="incomeDesc" type="text" [(ngModel)]="incomeForm.description" placeholder="Description" required />
-        <select name="incomeCategory" [(ngModel)]="incomeForm.categoryId" required>
-          <option [ngValue]="null">Select category</option>
-          <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
-        </select>
-        <div class="form-footer">
-          <button type="submit" class="mobile-icon-button" title="Add Income" aria-label="Add Income" [disabled]="incomeFormRef.invalid">
+      <div class="section-bar section-bar--dialog">
+        <h2 class="section-heading">
+          <span class="account-accent">{{ selectedAccountName }}</span> Account Income
+        </h2>
+        <div class="section-bar__actions">
+          <button
+            type="button"
+            class="mobile-icon-button"
+            title="Open Income Form"
+            aria-label="Open Income Form"
+            (click)="openIncomeDialog()"
+          >
             <span class="mobile-icon-button__label">Add Income</span>
             <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
             </svg>
           </button>
-          <p class="form-total"><strong>Total:</strong> {{ incomeTotal | currency }}</p>
         </div>
-      </form>
+      </div>
+      <p class="form-total"><strong>Total:</strong> {{ incomeTotal | currency }}</p>
       <div class="table-wrap">
         <table class="transactions-table">
           <thead>
@@ -415,6 +356,281 @@
           </svg>
         </button>
       </div>
+    </article>
+  </div>
+
+  <div class="dialog-backdrop" *ngIf="showAccountDialog" (click)="closeAccountDialog()">
+    <article
+      class="dialog-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-account-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="add-account-dialog-title">Add Account</h2>
+      <p class="muted">Create a new account and switch the transaction view to it immediately.</p>
+
+      <form class="dialog-form" (ngSubmit)="addAccount()">
+        <label>
+          Account name
+          <input
+            name="newAccount"
+            type="text"
+            [(ngModel)]="newAccountName"
+            placeholder="Add account name"
+            maxlength="120"
+            autofocus
+          />
+        </label>
+
+        <p class="error" *ngIf="accountDialogError">{{ accountDialogError }}</p>
+
+        <div class="dialog-card__actions">
+          <button type="submit">Add Account</button>
+          <button type="button" class="ghost-button" (click)="closeAccountDialog()">Cancel</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <div class="dialog-backdrop" *ngIf="showUploadDialog" (click)="closeUploadDialog()">
+    <article
+      class="dialog-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="upload-statement-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="upload-statement-dialog-title">Upload Statement</h2>
+      <p class="muted">Import a CSV statement for <strong>{{ selectedAccountName }}</strong>.</p>
+
+      <div class="dialog-form">
+        <div class="import-form">
+          <input
+            #statementFileInput
+            type="file"
+            accept=".csv"
+            (change)="onStatementFileChanged($event)"
+          />
+          <button
+            type="button"
+            [title]="uploading ? 'Importing statement' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement')"
+            [attr.aria-label]="uploading ? 'Importing statement' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement')"
+            (click)="uploadStatement(statementFileInput)"
+            [disabled]="uploading || !selectedAccountId"
+          >
+            {{ uploading ? 'Importing...' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement') }}
+          </button>
+        </div>
+
+        <p class="muted" *ngIf="selectedStatementFileName">Selected: {{ selectedStatementFileName }}</p>
+        <p class="error" *ngIf="error">{{ error }}</p>
+
+        <div class="mapping-panel" *ngIf="headerMappingPrompt as prompt">
+          <h3>CSV Header Mapping Needed</h3>
+          <p class="muted">{{ prompt.message }}</p>
+          <p class="muted">
+            Sample row:
+            <span *ngFor="let value of prompt.sampleRow; let i = index" class="chip">[{{ i }}] {{ value || '(empty)' }}</span>
+          </p>
+
+          <div class="mapping-grid">
+            <label>
+              Date Column Index
+              <input type="number" min="0" [(ngModel)]="headerMappingForm.dateColumnIndex" />
+            </label>
+            <label>
+              Amount Column Index
+              <input type="number" min="0" [(ngModel)]="headerMappingForm.amountColumnIndex" />
+            </label>
+            <label>
+              Description Column Index
+              <input type="number" min="0" [(ngModel)]="headerMappingForm.descriptionColumnIndex" />
+            </label>
+            <label>
+              Category Column Index (optional)
+              <input type="number" min="0" [(ngModel)]="headerMappingForm.categoryColumnIndex" />
+            </label>
+            <label>
+              External Id Column Index (optional)
+              <input type="number" min="0" [(ngModel)]="headerMappingForm.externalIdColumnIndex" />
+            </label>
+          </div>
+
+          <label class="checkbox">
+            <input type="checkbox" [(ngModel)]="headerMappingForm.saveHeaderMapping" />
+            Save this CSV mapping for selected account
+          </label>
+        </div>
+
+        <div class="dialog-card__actions">
+          <button type="button" class="ghost-button" (click)="closeUploadDialog()">Close</button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="dialog-backdrop" *ngIf="showExpenseDialog" (click)="closeExpenseDialog()">
+    <article
+      class="dialog-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-expense-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="add-expense-dialog-title">Add Expense</h2>
+      <p class="muted">Add a new expense transaction for <strong>{{ selectedAccountName }}</strong>.</p>
+
+      <form class="dialog-form" (ngSubmit)="addExpense()" #expenseDialogFormRef="ngForm">
+        <label>
+          Date
+          <input name="expenseDate" type="date" [(ngModel)]="expenseForm.date" required />
+        </label>
+        <label>
+          Amount
+          <input name="expenseAmount" type="number" step="0.01" min="0.01" [(ngModel)]="expenseForm.amount" required />
+        </label>
+        <label>
+          Description
+          <input name="expenseDesc" type="text" [(ngModel)]="expenseForm.description" placeholder="Description" required />
+        </label>
+        <label>
+          Category
+          <select
+            name="expenseCategory"
+            [ngModel]="expenseCategorySelection"
+            (ngModelChange)="onDialogCategorySelectionChanged('EXPENSE', $event)"
+            required
+          >
+            <option [ngValue]="null" disabled>Select category</option>
+            <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
+            <option [ngValue]="addCategoryOptionValue">+ Add New</option>
+          </select>
+        </label>
+
+        <p class="error" *ngIf="error">{{ error }}</p>
+
+        <div class="dialog-card__actions">
+          <button type="submit" [disabled]="expenseDialogFormRef.invalid || !expenseForm.categoryId">Add Expense</button>
+          <button type="button" class="ghost-button" (click)="closeExpenseDialog()">Cancel</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <div class="dialog-backdrop" *ngIf="showIncomeDialog" (click)="closeIncomeDialog()">
+    <article
+      class="dialog-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-income-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="add-income-dialog-title">Add Income</h2>
+      <p class="muted">Add a new income transaction for <strong>{{ selectedAccountName }}</strong>.</p>
+
+      <form class="dialog-form" (ngSubmit)="addIncome()" #incomeDialogFormRef="ngForm">
+        <label>
+          Date
+          <input name="incomeDate" type="date" [(ngModel)]="incomeForm.date" required />
+        </label>
+        <label>
+          Amount
+          <input name="incomeAmount" type="number" step="0.01" min="0.01" [(ngModel)]="incomeForm.amount" required />
+        </label>
+        <label>
+          Description
+          <input name="incomeDesc" type="text" [(ngModel)]="incomeForm.description" placeholder="Description" required />
+        </label>
+        <label>
+          Category
+          <select
+            name="incomeCategory"
+            [ngModel]="incomeCategorySelection"
+            (ngModelChange)="onDialogCategorySelectionChanged('INCOME', $event)"
+            required
+          >
+            <option [ngValue]="null" disabled>Select category</option>
+            <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
+            <option [ngValue]="addCategoryOptionValue">+ Add New</option>
+          </select>
+        </label>
+
+        <p class="error" *ngIf="error">{{ error }}</p>
+
+        <div class="dialog-card__actions">
+          <button type="submit" [disabled]="incomeDialogFormRef.invalid || !incomeForm.categoryId">Add Income</button>
+          <button type="button" class="ghost-button" (click)="closeIncomeDialog()">Cancel</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <div class="dialog-backdrop dialog-backdrop--nested" *ngIf="showCategoryDialog" (click)="closeCategoryDialog()">
+    <article
+      class="dialog-card dialog-card--compact"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-category-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="add-category-dialog-title">
+        Add {{ categoryDialogType === 'EXPENSE' ? 'Expense' : 'Income' }} Category
+      </h2>
+      <p class="muted">
+        Create a new {{ categoryDialogType === 'EXPENSE' ? 'expense' : 'income' }} category for
+        <strong>{{ selectedAccountName }}</strong>.
+      </p>
+
+      <form
+        class="dialog-form"
+        *ngIf="categoryDialogType === 'EXPENSE'"
+        (ngSubmit)="createCategoryFromDialog('EXPENSE')"
+        #expenseCategoryDialogFormRef="ngForm"
+      >
+        <label>
+          Category Name
+          <input
+            name="expenseNewCategory"
+            type="text"
+            [(ngModel)]="expenseCategoryDraft"
+            placeholder="New category name"
+            required
+          />
+        </label>
+
+        <p class="error" *ngIf="expenseCategoryError">{{ expenseCategoryError }}</p>
+
+        <div class="dialog-card__actions">
+          <button type="submit" [disabled]="expenseCategoryDialogFormRef.invalid">Save Category</button>
+          <button type="button" class="ghost-button" (click)="closeCategoryDialog()">Cancel</button>
+        </div>
+      </form>
+
+      <form
+        class="dialog-form"
+        *ngIf="categoryDialogType === 'INCOME'"
+        (ngSubmit)="createCategoryFromDialog('INCOME')"
+        #incomeCategoryDialogFormRef="ngForm"
+      >
+        <label>
+          Category Name
+          <input
+            name="incomeNewCategory"
+            type="text"
+            [(ngModel)]="incomeCategoryDraft"
+            placeholder="New category name"
+            required
+          />
+        </label>
+
+        <p class="error" *ngIf="incomeCategoryError">{{ incomeCategoryError }}</p>
+
+        <div class="dialog-card__actions">
+          <button type="submit" [disabled]="incomeCategoryDialogFormRef.invalid">Save Category</button>
+          <button type="button" class="ghost-button" (click)="closeCategoryDialog()">Cancel</button>
+        </div>
+      </form>
     </article>
   </div>
 </section>

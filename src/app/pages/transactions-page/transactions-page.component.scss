@@ -21,13 +21,6 @@
   align-items: flex-end;
 }
 
-/* Inline account-creation controls shown above the import panel. */
-.account-create {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.9rem;
-}
-
 /* Card that wraps CSV/statement import functionality. */
 .import-panel {
   border: 1px solid #dde7ea;
@@ -74,6 +67,85 @@
   margin: 0.4rem 0;
 }
 
+/* Shared top row for section titles, action buttons, and collapse toggle. */
+.section-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Group section header buttons together on the right. */
+.section-bar__actions {
+  display: none;
+}
+
+/* Always show dialog-launch actions for sections that no longer have inline forms. */
+.section-bar--dialog .section-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Full-screen backdrop behind the add-account dialog. */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(18, 49, 63, 0.42);
+}
+
+/* Raise nested category dialogs above the parent expense/income dialog. */
+.dialog-backdrop--nested {
+  z-index: 40;
+}
+
+/* Modal card for account creation launched from the account selector. */
+.dialog-card {
+  width: min(100%, 28rem);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid #d7e3e8;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(18, 49, 63, 0.18);
+}
+
+/* Slightly narrower modal variant for the nested add-category dialog. */
+.dialog-card--compact {
+  width: min(100%, 24rem);
+}
+
+/* Keep the dialog title tight to the top of the modal card. */
+.dialog-card h2 {
+  margin: 0 0 0.5rem;
+}
+
+/* Vertical layout for the add-account dialog form fields and actions. */
+.dialog-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* Stack the dialog label above its account-name input. */
+.dialog-form label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+/* Right-aligned action row at the bottom of the account dialog. */
+.dialog-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
 /* Pill styling for sample CSV values shown during header mapping. */
 .chip {
   display: inline-block;
@@ -97,6 +169,8 @@
 .muted {
   color: #4c5f66;
   font-size: 0.88rem;
+  padding: 0;
+  margin: 0;
 }
 
 /* Two-column layout for the expense and income transaction sections. */
@@ -120,7 +194,7 @@ article {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.45rem;
-  margin: 0 0 0.75rem;
+  margin: 0;
 }
 
 /* Highlighted account name badge used in expense/income titles. */
@@ -143,7 +217,7 @@ form {
   margin-bottom: 0.75rem;
 }
 
-/* Full-width footer row for submit button and section total. */
+/* Footer row for form submit actions and totals. */
 .form-footer {
   grid-column: 1 / -1;
   display: flex;
@@ -154,7 +228,7 @@ form {
 
 /* Inline total text shown beside the add-transaction button. */
 .form-total {
-  margin: 0;
+  margin: 10px 0 10px 0;
   color: #0f4f6d;
   font-size: 0.93rem;
   white-space: nowrap;
@@ -361,9 +435,7 @@ th {
 /* Mobile icon-button overrides that only apply inside the transactions page. */
 @media (max-width: 860px) {
   /* Prevent transaction-page icon buttons from stretching across their rows. */
-  .account-create .mobile-icon-button,
   .import-form .mobile-icon-button,
-  .form-footer .mobile-icon-button,
   .table-actions .mobile-icon-button {
     flex: 0 0 auto;
   }
@@ -421,9 +493,14 @@ th {
     flex-direction: column;
   }
 
-  /* Stack account-creation input and button on smaller screens. */
-  .account-create {
-    flex-direction: column;
+  /* Stack section title rows so they fit cleanly on smaller screens. */
+  .section-bar {
+    align-items: flex-start;
+  }
+
+  /* Keep section header action buttons aligned at the top on small screens. */
+  .section-bar__actions {
+    align-self: center;
   }
 
   /* Stack statement upload controls vertically on smaller screens. */
@@ -442,15 +519,9 @@ th {
     grid-template-columns: 1fr;
   }
 
-  /* Stack the add button and total text in each form footer on small screens. */
-  .form-footer {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  /* Allow totals to wrap when horizontal space is limited. */
-  .form-total {
-    white-space: normal;
+  /* Let add-account dialog actions stack on very narrow screens. */
+  .dialog-card__actions {
+    flex-direction: column-reverse;
   }
 
   /* Tighten the actions cell and clip anything that would overflow it. */
