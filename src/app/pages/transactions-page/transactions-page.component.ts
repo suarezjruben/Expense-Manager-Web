@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
 import { ApiService } from '../../core/api.service';
@@ -40,8 +40,7 @@ type CategoryDialogSource = 'FORM' | 'TRANSACTION';
   styleUrl: './transactions-page.component.scss'
 })
 export class TransactionsPageComponent implements OnInit {
-  readonly addAccountOptionValue = '__ADD_ACCOUNT__';
-  readonly addCategoryOptionValue = '__ADD_CATEGORY__';
+  readonly accountDropdownKey = 'account';
 
   month: string;
   loading = false;
@@ -84,14 +83,14 @@ export class TransactionsPageComponent implements OnInit {
   categoryDialogTransactionId: number | null = null;
   categoryDialogPreviousSelection: number | null = null;
   activeMobileTransactionTab: TransactionType = 'EXPENSE';
+  activeDropdownKey: string | null = null;
 
   expenseForm: NewTransactionForm = this.createDefaultForm();
   incomeForm: NewTransactionForm = this.createDefaultForm();
 
   constructor(
     private readonly api: ApiService,
-    private readonly monthState: MonthStateService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly monthState: MonthStateService
   ) {
     this.month = this.monthState.month;
   }
@@ -136,19 +135,14 @@ export class TransactionsPageComponent implements OnInit {
     this.load();
   }
 
-  onAccountChanged(select?: HTMLSelectElement): void {
-    if (this.accountSelection === this.addAccountOptionValue) {
-      const previousSelection = this.selectedAccountId;
-      this.accountSelection = previousSelection;
-      this.restoreAccountSelectElement(select, previousSelection);
-      this.openDialogNextTick(() => {
-        this.openAccountDialog();
-      });
-      return;
-    }
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.closeDropdowns();
+  }
 
-    this.selectedAccountId = typeof this.accountSelection === 'number' ? this.accountSelection : null;
-    this.load();
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    this.closeDropdowns();
   }
 
   addExpense(): void {
@@ -162,12 +156,14 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openAccountDialog(): void {
+    this.closeDropdowns();
     this.showAccountDialog = true;
     this.newAccountName = '';
     this.accountDialogError = '';
   }
 
   closeAccountDialog(): void {
+    this.closeDropdowns();
     this.showAccountDialog = false;
     this.newAccountName = '';
     this.accountDialogError = '';
@@ -175,17 +171,20 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openUploadDialog(): void {
+    this.closeDropdowns();
     this.showUploadDialog = true;
     this.error = '';
   }
 
   closeUploadDialog(): void {
+    this.closeDropdowns();
     this.showUploadDialog = false;
     this.error = '';
     this.resetUploadDialogState();
   }
 
   openExpenseDialog(): void {
+    this.closeDropdowns();
     this.activeMobileTransactionTab = 'EXPENSE';
     this.showExpenseDialog = true;
     this.error = '';
@@ -193,6 +192,7 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   closeExpenseDialog(): void {
+    this.closeDropdowns();
     this.showExpenseDialog = false;
     this.closeCategoryDialog();
     this.error = '';
@@ -200,6 +200,7 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openIncomeDialog(): void {
+    this.closeDropdowns();
     this.activeMobileTransactionTab = 'INCOME';
     this.showIncomeDialog = true;
     this.error = '';
@@ -211,38 +212,15 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   closeIncomeDialog(): void {
+    this.closeDropdowns();
     this.showIncomeDialog = false;
     this.closeCategoryDialog();
     this.error = '';
     this.incomeCategoryError = '';
   }
 
-  onDialogCategorySelectionChanged(type: TransactionType, value: number | string | null, select?: HTMLSelectElement): void {
-    if (value === this.addCategoryOptionValue) {
-      const previousSelection = this.getCategoryDialogSelection(type, 'FORM');
-      this.restoreDialogFormSelection(type, previousSelection);
-      this.restoreCategorySelectElement(type, 'FORM', select, previousSelection);
-      this.openDialogNextTick(() => {
-        this.openCategoryDialog(type, 'FORM');
-      });
-      return;
-    }
-
-    if (type === 'EXPENSE') {
-      this.expenseCategorySelection = value;
-      this.expenseCategoryError = '';
-      this.expenseCategoryDraft = '';
-      this.expenseForm.categoryId = typeof value === 'number' ? value : null;
-      return;
-    }
-
-    this.incomeCategorySelection = value;
-    this.incomeCategoryError = '';
-    this.incomeCategoryDraft = '';
-    this.incomeForm.categoryId = typeof value === 'number' ? value : null;
-  }
-
   openCategoryDialog(type: TransactionType, source: CategoryDialogSource, transactionId?: number): void {
+    this.closeDropdowns();
     this.showCategoryDialog = true;
     this.categoryDialogType = type;
     this.categoryDialogSource = source;
@@ -260,6 +238,7 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   closeCategoryDialog(restorePreviousSelection = true): void {
+    this.closeDropdowns();
     if (restorePreviousSelection && this.categoryDialogType) {
       this.restoreCategoryDialogSelection();
     }
@@ -279,6 +258,74 @@ export class TransactionsPageComponent implements OnInit {
     this.categoryDialogSource = 'FORM';
     this.categoryDialogTransactionId = null;
     this.categoryDialogPreviousSelection = null;
+  }
+
+  toggleDropdown(key: string): void {
+    this.activeDropdownKey = this.activeDropdownKey === key ? null : key;
+  }
+
+  closeDropdowns(): void {
+    this.activeDropdownKey = null;
+  }
+
+  isDropdownOpen(key: string): boolean {
+    return this.activeDropdownKey === key;
+  }
+
+  getDialogDropdownKey(type: TransactionType): string {
+    return `${type.toLowerCase()}-dialog-category`;
+  }
+
+  getTransactionDropdownKey(type: TransactionType, transactionId: number): string {
+    return `${type.toLowerCase()}-transaction-category-${transactionId}`;
+  }
+
+  getAccountSelectionLabel(): string {
+    if (this.selectedAccountId == null) {
+      return 'Select account';
+    }
+
+    return this.accounts.find((account) => account.id === this.selectedAccountId)?.name ?? 'Select account';
+  }
+
+  getDialogCategoryLabel(type: TransactionType): string {
+    return this.getCategoryLabel(type, type === 'EXPENSE' ? this.expenseForm.categoryId : this.incomeForm.categoryId);
+  }
+
+  getTransactionCategoryLabel(type: TransactionType, transactionId: number): string {
+    const transaction = (type === 'EXPENSE' ? this.expenses : this.incomes).find((item) => item.id === transactionId);
+    if (!transaction) {
+      return 'Select category';
+    }
+
+    return this.getCategoryLabel(type, this.getSelectedCategoryId(type, transaction));
+  }
+
+  selectAccount(accountId: number): void {
+    this.closeDropdowns();
+    this.accountSelection = accountId;
+    this.selectedAccountId = accountId;
+    this.load();
+  }
+
+  openAccountDialogFromDropdown(): void {
+    this.closeDropdowns();
+    this.openAccountDialog();
+  }
+
+  selectDialogCategoryOption(type: TransactionType, categoryId: number): void {
+    this.closeDropdowns();
+    this.selectDialogCategory(type, categoryId);
+  }
+
+  openCategoryDialogFromDropdown(type: TransactionType, source: CategoryDialogSource, transactionId?: number): void {
+    this.closeDropdowns();
+    this.openCategoryDialog(type, source, transactionId);
+  }
+
+  selectTransactionCategoryOption(type: TransactionType, transactionId: number, categoryId: number): void {
+    this.closeDropdowns();
+    this.selectTransactionCategory(type, transactionId, categoryId);
   }
 
   createCategoryFromDialog(type: TransactionType): void {
@@ -365,36 +412,6 @@ export class TransactionsPageComponent implements OnInit {
       next: () => this.load(),
       error: (error) => (this.error = this.toMessage(error))
     });
-  }
-
-  onTransactionCategoryChanged(
-    type: TransactionType,
-    transactionId: number,
-    categoryId: number | string | null,
-    select?: HTMLSelectElement
-  ): void {
-    if (categoryId === this.addCategoryOptionValue) {
-      const transaction = (type === 'EXPENSE' ? this.expenses : this.incomes).find((item) => item.id === transactionId);
-      const previousSelection = transaction ? this.getSelectedCategoryId(type, transaction) : null;
-      if (previousSelection != null) {
-        this.selectTransactionCategory(type, transactionId, previousSelection);
-      }
-      this.restoreCategorySelectElement(type, 'TRANSACTION', select, previousSelection);
-      this.openDialogNextTick(() => {
-        this.openCategoryDialog(type, 'TRANSACTION', transactionId);
-      });
-      return;
-    }
-
-    if (typeof categoryId !== 'number') {
-      return;
-    }
-
-    if (type === 'EXPENSE') {
-      this.expenseCategoryByTransactionId[transactionId] = categoryId;
-      return;
-    }
-    this.incomeCategoryByTransactionId[transactionId] = categoryId;
   }
 
   hasCategoryChanged(type: TransactionType, transaction: TransactionDto): boolean {
@@ -786,6 +803,15 @@ export class TransactionsPageComponent implements OnInit {
     return categories.find((category) => category.name.trim().toLowerCase() === normalized);
   }
 
+  private getCategoryLabel(type: TransactionType, categoryId: number | null): string {
+    if (categoryId == null) {
+      return 'Select category';
+    }
+
+    const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
+    return categories.find((category) => category.id === categoryId)?.name ?? 'Select category';
+  }
+
   private selectDialogCategory(type: TransactionType, categoryId: number): void {
     const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
     const category = categories.find((item) => item.id === categoryId);
@@ -878,45 +904,6 @@ export class TransactionsPageComponent implements OnInit {
 
     this.incomeCategorySelection = null;
     this.incomeForm.categoryId = null;
-  }
-
-  private openDialogNextTick(openDialog: () => void): void {
-    this.changeDetectorRef.detectChanges();
-    setTimeout(openDialog, 0);
-  }
-
-  private restoreAccountSelectElement(select: HTMLSelectElement | undefined, accountId: number | null): void {
-    if (!select) {
-      return;
-    }
-
-    const optionIndex = accountId == null ? 0 : this.accounts.findIndex((account) => account.id === accountId) + 1;
-    if (optionIndex >= 0) {
-      select.selectedIndex = optionIndex;
-    }
-  }
-
-  private restoreCategorySelectElement(
-    type: TransactionType,
-    source: CategoryDialogSource,
-    select: HTMLSelectElement | undefined,
-    categoryId: number | null
-  ): void {
-    if (!select) {
-      return;
-    }
-
-    const categories = type === 'EXPENSE' ? this.expenseCategories : this.incomeCategories;
-    const categoryIndex = categoryId == null ? -1 : categories.findIndex((category) => category.id === categoryId);
-
-    if (source === 'FORM') {
-      select.selectedIndex = categoryIndex >= 0 ? categoryIndex + 1 : 0;
-      return;
-    }
-
-    if (categoryIndex >= 0) {
-      select.selectedIndex = categoryIndex;
-    }
   }
 
   private toMessage(error: unknown): string {
