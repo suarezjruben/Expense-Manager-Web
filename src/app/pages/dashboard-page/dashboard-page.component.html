@@ -56,49 +56,114 @@
       </article>
     </div>
 
+    <div class="mobile-category-tabs" role="tablist" aria-label="Dashboard category sections">
+      <button
+        type="button"
+        id="dashboard-expense-categories-tab"
+        role="tab"
+        class="mobile-category-tab"
+        [class.mobile-category-tab--active]="activeMobileCategoryTab === 'EXPENSE'"
+        [attr.aria-selected]="activeMobileCategoryTab === 'EXPENSE'"
+        aria-controls="dashboard-expense-categories-panel"
+        (click)="setActiveMobileCategoryTab('EXPENSE')"
+      >
+        Expense Categories
+      </button>
+      <button
+        type="button"
+        id="dashboard-income-categories-tab"
+        role="tab"
+        class="mobile-category-tab"
+        [class.mobile-category-tab--active]="activeMobileCategoryTab === 'INCOME'"
+        [attr.aria-selected]="activeMobileCategoryTab === 'INCOME'"
+        aria-controls="dashboard-income-categories-panel"
+        (click)="setActiveMobileCategoryTab('INCOME')"
+      >
+        Income Categories
+      </button>
+    </div>
+
     <div class="tables">
-      <div>
+      <section
+        id="dashboard-expense-categories-panel"
+        role="tabpanel"
+        aria-labelledby="dashboard-expense-categories-tab"
+        class="category-panel"
+        [class.category-panel--active]="activeMobileCategoryTab === 'EXPENSE'"
+        [class.category-panel--inactive]="activeMobileCategoryTab !== 'EXPENSE'"
+      >
         <h3>Expense Categories</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Planned</th>
-              <th>Actual</th>
-              <th>Diff</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of s.expenseCategories">
-              <td>{{ row.categoryName }}</td>
-              <td>{{ row.planned | currency }}</td>
-              <td>{{ row.actual | currency }}</td>
-              <td>{{ row.diff | currency }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div>
+        <div class="category-table-wrap">
+          <table class="category-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Planned</th>
+                <th>Actual</th>
+                <th>Diff</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of s.expenseCategories">
+                <td>{{ row.categoryName }}</td>
+                <td>{{ row.planned | currency }}</td>
+                <td>{{ row.actual | currency }}</td>
+                <td>{{ row.diff | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="category-cards">
+          <article class="category-card" *ngFor="let row of s.expenseCategories">
+            <h4>{{ row.categoryName }}</h4>
+            <div class="category-card__stats">
+              <div class="kv"><span>Planned</span><span>{{ row.planned | currency }}</span></div>
+              <div class="kv"><span>Actual</span><span>{{ row.actual | currency }}</span></div>
+              <div class="kv"><span>Diff</span><span>{{ row.diff | currency }}</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section
+        id="dashboard-income-categories-panel"
+        role="tabpanel"
+        aria-labelledby="dashboard-income-categories-tab"
+        class="category-panel"
+        [class.category-panel--active]="activeMobileCategoryTab === 'INCOME'"
+        [class.category-panel--inactive]="activeMobileCategoryTab !== 'INCOME'"
+      >
         <h3>Income Categories</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Planned</th>
-              <th>Actual</th>
-              <th>Diff</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of s.incomeCategories">
-              <td>{{ row.categoryName }}</td>
-              <td>{{ row.planned | currency }}</td>
-              <td>{{ row.actual | currency }}</td>
-              <td>{{ row.diff | currency }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <div class="category-table-wrap">
+          <table class="category-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Planned</th>
+                <th>Actual</th>
+                <th>Diff</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of s.incomeCategories">
+                <td>{{ row.categoryName }}</td>
+                <td>{{ row.planned | currency }}</td>
+                <td>{{ row.actual | currency }}</td>
+                <td>{{ row.diff | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="category-cards">
+          <article class="category-card" *ngFor="let row of s.incomeCategories">
+            <h4>{{ row.categoryName }}</h4>
+            <div class="category-card__stats">
+              <div class="kv"><span>Planned</span><span>{{ row.planned | currency }}</span></div>
+              <div class="kv"><span>Actual</span><span>{{ row.actual | currency }}</span></div>
+              <div class="kv"><span>Diff</span><span>{{ row.diff | currency }}</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
     </div>
   </ng-container>
 </section>

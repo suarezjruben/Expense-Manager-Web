@@ -14,6 +14,8 @@ import { MonthStateService } from '../../core/month-state.service';
   styleUrl: './dashboard-page.component.scss'
 })
 export class DashboardPageComponent implements OnInit {
+  activeMobileCategoryTab: 'EXPENSE' | 'INCOME' = 'EXPENSE';
+
   month: string;
   loading = false;
   error = '';
@@ -60,6 +62,10 @@ export class DashboardPageComponent implements OnInit {
       next: () => this.load(),
       error: (error) => (this.error = this.toMessage(error))
     });
+  }
+
+  setActiveMobileCategoryTab(type: 'EXPENSE' | 'INCOME'): void {
+    this.activeMobileCategoryTab = type;
   }
 
   private toMessage(error: unknown): string {

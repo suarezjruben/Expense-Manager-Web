@@ -117,11 +117,68 @@ button {
   gap: 1rem;
 }
 
+/* Hide the mobile category tab strip until the mobile breakpoint enables it. */
+.mobile-category-tabs {
+  display: none;
+}
+
+/* Base styling for mobile dashboard category tab buttons. */
+.mobile-category-tab {
+  border: 1px solid #c9dce3;
+  background: #edf6f8;
+  color: #0f4f6d;
+  font-weight: 700;
+}
+
+/* Selected state for the active mobile dashboard category tab. */
+.mobile-category-tab--active {
+  background: #0e7490;
+  border-color: #0e7490;
+  color: #fff;
+}
+
+/* Keep each category panel from overflowing its grid column. */
+.category-panel {
+  min-width: 0;
+}
+
+/* Scroll-safe wrapper for dashboard category tables. */
+.category-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e1eaee;
+  border-radius: 10px;
+  background: #fff;
+}
+
 /* Base styling for dashboard detail tables. */
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
+}
+
+/* Hide the mobile summary-card version of category rows on larger screens. */
+.category-cards {
+  display: none;
+}
+
+/* Individual mobile category summary cards. */
+.category-card {
+  padding: 0.75rem;
+  border: 1px solid #d7e3e8;
+  border-radius: 10px;
+  background: #f8fbfc;
+}
+
+/* Keep mobile category-card headings compact. */
+.category-card h4 {
+  margin: 0 0 0.55rem;
+}
+
+/* Vertical stack of summary values inside a mobile category card. */
+.category-card__stats {
+  display: grid;
+  gap: 0.25rem;
 }
 
 /* Shared table header/body cell styling for dashboard tables. */
@@ -150,5 +207,32 @@ td {
   .toolbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  /* Show the mobile dashboard category tabs above the stacked category section. */
+  .mobile-category-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Keep only the active category panel visible on smaller screens. */
+  .category-panel--inactive {
+    display: none;
+  }
+}
+
+/* Portrait mobile dashboard layout that swaps wide category tables for stacked summary cards. */
+@media (max-width: 900px) and (orientation: portrait) {
+  /* Hide the 4-column category table once portrait cards take over. */
+  .category-table-wrap {
+    display: none;
+  }
+
+  /* Show the stacked category summary cards in portrait mode. */
+  .category-cards {
+    display: grid;
+    gap: 0.6rem;
   }
 }
