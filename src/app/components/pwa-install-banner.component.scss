@@ -1,0 +1,105 @@
+:host {
+  display: block;
+}
+
+.install-banner-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 0;
+}
+
+.install-banner {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(17, 138, 178, 0.18);
+  border-radius: 1.4rem;
+  background:
+    linear-gradient(135deg, rgba(17, 138, 178, 0.12), rgba(6, 214, 160, 0.08)),
+    rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 40px rgba(18, 49, 63, 0.08);
+}
+
+.install-banner__content h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.1rem;
+}
+
+.install-banner__content p {
+  margin: 0;
+  color: #3f5d6c;
+}
+
+.install-banner__eyebrow {
+  margin: 0 0 0.35rem;
+  color: #118ab2;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.install-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.install-banner__button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.install-banner__button--primary {
+  background: linear-gradient(135deg, #118ab2, #0d9488);
+  color: #fff;
+}
+
+.install-banner__button--secondary {
+  background: rgba(255, 255, 255, 0.88);
+  color: #12313f;
+  border: 1px solid #c7dae1;
+}
+
+.install-banner__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.install-banner__steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #12313f;
+  display: grid;
+  gap: 0.45rem;
+}
+
+@media (min-width: 860px) {
+  .install-banner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .install-banner__steps {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 860px) {
+  .install-banner-wrap {
+    padding: 0.9rem 1rem 0;
+  }
+
+  .install-banner__actions {
+    width: 100%;
+  }
+
+  .install-banner__button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

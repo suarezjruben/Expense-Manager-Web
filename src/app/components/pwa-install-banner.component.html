@@ -1,0 +1,49 @@
+<ng-container *ngIf="state$ | async as state">
+  <section class="install-banner-wrap" *ngIf="state.visible">
+    <article class="install-banner" [class.install-banner--ios]="state.platform === 'ios-safari'">
+      <div class="install-banner__content">
+        <p class="install-banner__eyebrow">Install on your phone</p>
+
+        <ng-container *ngIf="state.platform === 'chromium-prompt'; else iosInstall">
+          <h2>Open Expense Manager from your home screen.</h2>
+          <p>
+            Install the app for faster access, a cleaner full-screen layout, and a more native mobile feel.
+          </p>
+        </ng-container>
+
+        <ng-template #iosInstall>
+          <h2>Save Expense Manager to your iPhone home screen.</h2>
+          <p>
+            Safari can add this app to your home screen so it opens like a mobile app without browser chrome.
+          </p>
+        </ng-template>
+      </div>
+
+      <div class="install-banner__actions">
+        <ng-container *ngIf="state.platform === 'chromium-prompt'; else iosActions">
+          <button type="button" class="install-banner__button install-banner__button--primary" (click)="install()" [disabled]="!state.canPrompt">
+            Install app
+          </button>
+          <button type="button" class="install-banner__button install-banner__button--secondary" (click)="dismiss()">
+            Not now
+          </button>
+        </ng-container>
+
+        <ng-template #iosActions>
+          <button type="button" class="install-banner__button install-banner__button--primary" (click)="toggleInstructions()">
+            {{ state.expandedInstructions ? 'Hide steps' : 'How to install' }}
+          </button>
+          <button type="button" class="install-banner__button install-banner__button--secondary" (click)="dismiss()">
+            Dismiss
+          </button>
+        </ng-template>
+      </div>
+
+      <ol class="install-banner__steps" *ngIf="state.platform === 'ios-safari' && state.expandedInstructions">
+        <li>Tap <strong>Share</strong> in Safari.</li>
+        <li>Choose <strong>Add to Home Screen</strong>.</li>
+        <li>Tap <strong>Add</strong> to finish.</li>
+      </ol>
+    </article>
+  </section>
+</ng-container>

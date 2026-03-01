@@ -1,17 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
+import { PwaInstallService } from './core/pwa-install.service';
 import { SupabaseService } from './core/supabase.service';
+import { PwaInstallBannerComponent } from './components/pwa-install-banner.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, FormsModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, RouterOutlet, RouterLink, RouterLinkActive, PwaInstallBannerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  private readonly pwaInstall = inject(PwaInstallService);
   email = '';
   authBusy = false;
   authMessage = '';

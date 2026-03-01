@@ -13,6 +13,7 @@ The app is designed to run as a browser-only client with:
 - Angular 19
 - Supabase Auth + Postgres
 - Firebase Hosting
+- Installable PWA support for phones
 - CSV-only statement import in the browser
 
 ## Current Scope
@@ -22,6 +23,7 @@ The app is designed to run as a browser-only client with:
 - Plans and category management
 - CSV statement import with optional column mapping memory per account
 - Supabase magic-link sign-in
+- Home screen install flow for supported mobile browsers
 
 ## Public Repo Safety
 
@@ -45,6 +47,17 @@ What must never be committed or shipped to the browser:
 - CI deploy tokens
 
 Firebase Hosting can serve public runtime config to the browser, but it cannot keep browser-consumed values secret. If the app later needs real secrets, add a server-side component such as Firebase Cloud Functions, Cloud Run, or Firebase App Hosting with Secret Manager.
+
+## Mobile Install Support
+
+The app now ships as a Progressive Web App.
+
+- Production builds include a web app manifest and Angular service worker.
+- Firebase Hosting serves the installable PWA over HTTPS.
+- Android and other supported Chromium mobile browsers can show a native install prompt.
+- iPhone and iPad users should use Safari's `Add to Home Screen` flow.
+- `localhost` still works for local development and installability checks.
+- Supabase-backed account data remains online-first; only the shell and static assets are cached.
 
 ## Project Structure
 
@@ -118,7 +131,7 @@ The workflow at `.github/workflows/deploy-hosting.yml` will:
 
 1. Read GitHub Actions variables and secrets
 2. Generate `public/runtime-config.js` during CI
-3. Build the Angular app
+3. Build the Angular PWA
 4. Deploy to the Firebase Hosting live channel
 
 This keeps the repo clean on GitHub, but remember that browser runtime config is still public after deployment. Only browser-safe values belong in these variables.
@@ -175,4 +188,5 @@ All tables are user-scoped with row level security using `auth.uid()`.
 - Statement import is CSV only.
 - CSV parsing and dedupe run in the browser.
 - Summary calculations now run in the Angular client instead of a server endpoint.
+- Mobile install uses the native browser install path where available.
 - No Firebase client SDK is used in-app; Firebase is only used for Hosting in this project.
