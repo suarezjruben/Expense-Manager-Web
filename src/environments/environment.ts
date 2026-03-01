@@ -3,6 +3,7 @@ export const environment = {
   supabase: {
     url: '',
     publishableKey: '',
-    anonKey: ''
+    anonKey: '',
+    schema: 'expense_manager'
   }
 };

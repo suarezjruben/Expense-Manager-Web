@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { getSupabasePublicCredentials } from './runtime-config';
+import { getSupabaseClientConfig, getSupabasePublicCredentials } from './runtime-config';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
-  private clientInstance: SupabaseClient | null = null;
+  private clientInstance: SupabaseClient<any, string, string> | null = null;
 
   get isConfigured(): boolean {
     const { key, url } = getSupabasePublicCredentials();
     return Boolean(url && key);
   }
 
-  get client(): SupabaseClient {
-    const { key, url } = getSupabasePublicCredentials();
+  get client(): SupabaseClient<any, string, string> {
+    const { key, schema, url } = getSupabaseClientConfig();
 
     if (!this.isConfigured) {
       throw new Error('Supabase is not configured. Copy public/runtime-config.example.js to public/runtime-config.js.');
@@ -24,11 +24,14 @@ export class SupabaseService {
           autoRefreshToken: true,
           detectSessionInUrl: true,
           persistSession: true
+        },
+        db: {
+          schema
         }
       });
     }
 
-    return this.clientInstance;
+    return this.clientInstance!;
   }
 
   async getRequiredUserId(): Promise<string> {

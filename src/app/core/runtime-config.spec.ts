@@ -39,7 +39,8 @@ describe('runtime-config', () => {
       supabase: {
         url: '',
         publishableKey: undefined,
-        anonKey: undefined
+        anonKey: undefined,
+        schema: 'expense_manager'
       }
     });
   });

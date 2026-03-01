@@ -63,12 +63,13 @@ expense-manager-web/
 1. Create a Supabase project.
 2. In the Supabase SQL editor, run `supabase/schema.sql`.
 3. In Supabase Auth, enable email sign-in and magic links.
-4. Add these redirect URLs in Supabase Auth:
+4. In Supabase Settings > API, expose the `expense_manager` schema to the Data API.
+5. Add these redirect URLs in Supabase Auth:
    - `http://localhost:4200`
    - your Firebase Hosting domain
    - any custom domain you actually use
-5. Copy `public/runtime-config.example.js` to `public/runtime-config.js`.
-6. Fill in your Supabase URL and either a `publishableKey` or legacy `anonKey`.
+6. Copy `public/runtime-config.example.js` to `public/runtime-config.js`.
+7. Fill in your Supabase URL and either a `publishableKey` or legacy `anonKey`.
 
 Example:
 
@@ -76,7 +77,8 @@ Example:
 window.__appConfig__ = {
   supabase: {
     url: 'https://YOUR_PROJECT.supabase.co',
-    publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY'
+    publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY',
+    schema: 'expense_manager'
   }
 };
 ```
@@ -106,6 +108,7 @@ Variables:
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
 - Optional fallback: `SUPABASE_ANON_KEY`
+- Optional override: `SUPABASE_SCHEMA` (defaults to `expense_manager`)
 
 Secrets:
 
@@ -154,7 +157,7 @@ The repo also includes a GitHub Actions gitleaks workflow to catch accidental se
 
 ## Data Model
 
-The Supabase schema includes:
+The Supabase schema includes these tables under `expense_manager`:
 
 - `accounts`
 - `categories`
