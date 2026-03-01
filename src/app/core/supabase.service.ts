@@ -6,6 +6,10 @@ import { getSupabaseClientConfig, getSupabasePublicCredentials } from './runtime
 export class SupabaseService {
   private clientInstance: SupabaseClient<any, string, string> | null = null;
 
+  get schema(): string {
+    return getSupabaseClientConfig().schema;
+  }
+
   get isConfigured(): boolean {
     const { key, url } = getSupabasePublicCredentials();
     return Boolean(url && key);

@@ -18,6 +18,7 @@ import {
   UpdateCategoryRequest
 } from './api.models';
 import { CsvImportService } from './csv-import.service';
+import { formatSupabaseError } from './supabase-error';
 import { SupabaseService } from './supabase.service';
 import { AccountRow, CategoryRow, MonthSettingsRow, PlanRow, TransactionRow } from './supabase.models';
 
@@ -852,9 +853,9 @@ export class ApiService {
     return trimmed ? trimmed : null;
   }
 
-  private throwIfError(error: { message: string } | null): void {
+  private throwIfError(error: { code?: string; details?: string | null; hint?: string | null; message?: string } | null): void {
     if (error) {
-      throw new Error(error.message);
+      throw new Error(formatSupabaseError(error, this.supabase.schema));
     }
   }
 }

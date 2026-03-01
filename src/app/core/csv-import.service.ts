@@ -13,6 +13,7 @@ import {
   NormalizedStatementRow,
   StatementIssue
 } from './csv-statement-parser.service';
+import { formatSupabaseError } from './supabase-error';
 import { SupabaseService } from './supabase.service';
 import { AccountRow, CategoryRow, CsvMappingRow, ImportBatchRow, TransactionRow } from './supabase.models';
 
@@ -484,9 +485,9 @@ export class CsvImportService {
     return Math.round(value * 100) / 100;
   }
 
-  private throwIfError(error: { message: string } | null): void {
+  private throwIfError(error: { code?: string; details?: string | null; hint?: string | null; message?: string } | null): void {
     if (error) {
-      throw new Error(error.message);
+      throw new Error(formatSupabaseError(error, this.supabase.schema));
     }
   }
 }
