@@ -1,3 +1,4 @@
+/* Outer card for the plans page content. */
 .panel {
   background: #fff;
   border: 1px solid #d7e3e8;
@@ -5,6 +6,7 @@
   padding: 1rem;
 }
 
+/* Top toolbar for page heading and controls. */
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -12,6 +14,7 @@
   margin-bottom: 1rem;
 }
 
+/* Two-column layout for expense and income planning sections. */
 .layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -19,6 +22,7 @@
   margin-bottom: 1rem;
 }
 
+/* Base card styling for plan and category management sections. */
 article {
   border: 1px solid #dde7ea;
   border-radius: 12px;
@@ -26,18 +30,21 @@ article {
   background: #f8fbfc;
 }
 
+/* Row for adding a new category or plan-related item. */
 .new-item {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 0.6rem;
 }
 
+/* Base input styling for the plans page. */
 input {
   border: 1px solid #c8d8de;
   border-radius: 8px;
   padding: 0.35rem 0.45rem;
 }
 
+/* Default button styling for plans page actions. */
 button {
   border: 0;
   background: #0f766e;
@@ -47,10 +54,12 @@ button {
   cursor: pointer;
 }
 
+/* Destructive button variant for delete actions. */
 button.danger {
   background: #b91c1c;
 }
 
+/* Base styling for plan/category tables. */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -58,6 +67,7 @@ table {
   margin-bottom: 0.5rem;
 }
 
+/* Shared cell styling for plan/category tables. */
 th,
 td {
   border-bottom: 1px solid #e8eff1;
@@ -65,11 +75,14 @@ td {
   text-align: left;
 }
 
+/* Error message styling for plans page failures. */
 .error {
   color: #b91c1c;
 }
 
+/* Mobile/tablet layout override for screens 1000px and smaller. */
 @media (max-width: 1000px) {
+  /* Collapse the two planning columns into a single stacked column. */
   .layout {
     grid-template-columns: 1fr;
   }

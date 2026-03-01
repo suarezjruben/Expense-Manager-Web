@@ -1,7 +1,9 @@
+/* Make the root app component behave like a block layout container. */
 :host {
   display: block;
 }
 
+/* App-wide shell background and minimum viewport-height wrapper. */
 .shell {
   min-height: 100vh;
   background:
@@ -12,6 +14,7 @@
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
 
+/* Sticky authenticated top bar that spans the viewport width. */
 .topbar {
   position: sticky;
   top: 0;
@@ -28,10 +31,12 @@
   will-change: transform;
 }
 
+/* Fully hide the top bar when scroll logic adds the hidden modifier class. */
 .topbar--hidden {
   transform: translateY(calc(-100% - 1px));
 }
 
+/* Group the brand mark and title text in the top bar. */
 .brand {
   display: flex;
   align-items: center;
@@ -40,6 +45,7 @@
   letter-spacing: 0.02em;
 }
 
+/* Circular gradient dot shown before the app name. */
 .brand-mark {
   width: 0.8rem;
   height: 0.8rem;
@@ -47,17 +53,20 @@
   background: linear-gradient(135deg, #118ab2, #06d6a0);
 }
 
+/* Horizontal navigation row for the authenticated top bar. */
 nav {
   display: flex;
   gap: 0.4rem;
 }
 
+/* Layout wrapper for right-side top bar actions and session controls. */
 .topbar-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
+/* Base navigation link styling for top bar routes. */
 nav a {
   color: #34505e;
   text-decoration: none;
@@ -67,21 +76,25 @@ nav a {
   transition: all 0.2s ease;
 }
 
+/* Hover treatment for inactive top bar nav links. */
 nav a:hover {
   background: #e5f4f2;
 }
 
+/* Active route styling for the current top bar nav item. */
 nav a.active {
   background: #118ab2;
   color: #fff;
 }
 
+/* Main routed content container below the top bar. */
 .content {
   max-width: 95vw;
   margin: 0 auto;
   padding: 1.25rem;
 }
 
+/* Signed-in user chip containing the email and session actions. */
 .session-chip {
   position: relative;
   display: flex;
@@ -94,6 +107,7 @@ nav a.active {
   font-size: 0.95rem;
 }
 
+/* Buttons rendered inside the session chip. */
 .session-chip button {
   border: none;
   border-radius: 999px;
@@ -104,15 +118,18 @@ nav a.active {
   font: inherit;
 }
 
+/* Busy/disabled state for buttons inside the session chip. */
 .session-chip button:disabled {
   cursor: wait;
   opacity: 0.7;
 }
 
+/* Prevent the signed-in email label from wrapping across lines. */
 .session-chip__email {
   white-space: nowrap;
 }
 
+/* Center the signed-out auth card vertically and horizontally in the viewport. */
 .gate {
   min-height: 100vh;
   display: grid;
@@ -120,6 +137,7 @@ nav a.active {
   padding: 1.5rem;
 }
 
+/* Card that wraps the sign-in, sign-up, and recovery forms. */
 .gate-card {
   width: min(100%, 520px);
   padding: 2rem;
@@ -129,6 +147,7 @@ nav a.active {
   box-shadow: 0 24px 80px rgba(18, 49, 63, 0.08);
 }
 
+/* Small uppercase label shown above the auth card heading. */
 .eyebrow {
   margin: 0 0 0.4rem;
   text-transform: uppercase;
@@ -138,27 +157,32 @@ nav a.active {
   color: #118ab2;
 }
 
+/* Primary heading inside the auth card. */
 .gate-card h1 {
   margin: 0 0 0.75rem;
   font-size: 2rem;
 }
 
+/* Muted helper copy used within the auth card. */
 .muted {
   color: #52707e;
 }
 
+/* Vertical form layout for auth fields and actions. */
 .gate-form {
   display: grid;
   gap: 1rem;
   margin-top: 1.5rem;
 }
 
+/* Stack auth field labels above their inputs. */
 .gate-form label {
   display: grid;
   gap: 0.4rem;
   font-weight: 600;
 }
 
+/* Style text inputs within the auth form. */
 .gate-form input {
   width: 100%;
   padding: 0.85rem 1rem;
@@ -167,12 +191,14 @@ nav a.active {
   font: inherit;
 }
 
+/* Two-column action row for primary auth submit buttons on larger screens. */
 .gate-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
+/* Primary button styling for auth form submit actions. */
 .gate-form button {
   border: none;
   border-radius: 999px;
@@ -184,15 +210,18 @@ nav a.active {
   font-weight: 700;
 }
 
+/* Busy/disabled state for auth form buttons. */
 .gate-form button:disabled {
   cursor: wait;
   opacity: 0.75;
 }
 
+/* Darker alternate button style used for secondary auth actions. */
 .secondary-button {
   background: #12313f;
 }
 
+/* Two-column link/action row below the main auth form buttons. */
 .auth-links {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -200,6 +229,7 @@ nav a.active {
   margin-top: 0.95rem;
 }
 
+/* Button styling for reset-password and sign-in-link style actions. */
 .link-button {
   width: 100%;
   display: flex;
@@ -216,27 +246,33 @@ nav a.active {
   transition: border-color 0.2s ease;
 }
 
+/* Hover state for auth link-style buttons. */
 .link-button:hover {
   border-color: #99bfcb;
 }
 
+/* Busy/disabled state for auth link-style buttons. */
 .link-button:disabled {
   cursor: wait;
   opacity: 0.75;
 }
 
+/* Smaller helper text shown below auth actions. */
 .hint {
   margin: 0.9rem 0 0;
   color: #52707e;
   font-size: 0.92rem;
 }
 
+/* Inline status or confirmation message shown in auth flows. */
 .status {
   margin: 1rem 0 0;
   color: #12313f;
 }
 
+/* Mobile layout overrides for the app shell and auth card at 860px or below. */
 @media (max-width: 860px) {
+  /* Stack the top bar sections vertically on narrow screens. */
   .topbar {
     flex-direction: column;
     align-items: flex-start;
@@ -244,31 +280,37 @@ nav a.active {
     padding: 1rem;
   }
 
+  /* Let nav links scroll horizontally instead of wrapping awkwardly. */
   nav {
     width: 100%;
     overflow-x: auto;
     padding-bottom: 0.2rem;
   }
 
+  /* Stack top bar action groups on mobile. */
   .topbar-actions {
     width: 100%;
     flex-direction: column;
     align-items: stretch;
   }
 
+  /* Expand the session chip to the full mobile header width. */
   .session-chip {
     width: 100%;
     justify-content: space-between;
   }
 
+  /* Reduce routed content padding on smaller screens. */
   .content {
     padding: 1rem;
   }
 
+  /* Collapse auth primary actions to a single column on mobile. */
   .gate-actions {
     grid-template-columns: 1fr;
   }
 
+  /* Collapse auth link actions to a single column on mobile. */
   .auth-links {
     grid-template-columns: 1fr;
   }

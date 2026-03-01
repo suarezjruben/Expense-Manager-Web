@@ -1,19 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
 
+/* Apply predictable box sizing to every element in the app. */
 * {
   box-sizing: border-box;
 }
 
+/* Reset the page shell and ensure the document can stretch to full height. */
 html,
 body {
   margin: 0;
   min-height: 100%;
 }
 
+/* Set the default global typeface for the application. */
 body {
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
 
+/* Force Angular host elements to behave like block-level layout containers. */
 app-root,
 app-dashboard-page,
 app-transactions-page,
@@ -22,6 +26,7 @@ app-pwa-install-banner {
   display: block;
 }
 
+/* Constrain shared shell banners/status rows to the centered content width. */
 .shell-banner,
 .shell-status {
   max-width: 1200px;
@@ -29,6 +34,7 @@ app-pwa-install-banner {
   padding: 0 1.25rem;
 }
 
+/* Style the card that wraps the shell-level banner content. */
 .shell-banner__card {
   padding: 1.25rem;
   border: 1px solid #d4e1e7;
@@ -36,6 +42,7 @@ app-pwa-install-banner {
   background: rgba(255, 255, 255, 0.9);
 }
 
+/* Lay out banner heading content and actions on a flexible row. */
 .shell-banner__header {
   display: flex;
   justify-content: space-between;
@@ -43,11 +50,13 @@ app-pwa-install-banner {
   flex-wrap: wrap;
 }
 
+/* Emphasize shell-level status messages shown below the top bar. */
 .shell-status {
   color: #12313f;
   font-weight: 600;
 }
 
+/* Shared neutral button styling used outside feature-specific components. */
 .ghost-button {
   border: 1px solid #c7dae1;
   border-radius: 999px;
@@ -58,6 +67,7 @@ app-pwa-install-banner {
   font: inherit;
 }
 
+/* Hide the mobile session-menu trigger by default on larger screens. */
 .session-chip__toggle {
   display: none;
   align-items: center;
@@ -67,21 +77,25 @@ app-pwa-install-banner {
   color: #12313f;
 }
 
+/* Size the chevron/icon inside the mobile session-menu trigger. */
 .session-chip__toggle svg {
   width: 0.95rem;
   height: 0.95rem;
 }
 
+/* Keep signed-in header actions inline on non-mobile layouts. */
 .session-chip__inline-actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
+/* Keep the mobile session dropdown hidden until mobile styles enable it. */
 .session-menu {
   display: none;
 }
 
+/* Base layout for buttons that collapse to icon-only on smaller screens. */
 .mobile-icon-button {
   display: inline-flex;
   align-items: center;
@@ -89,6 +103,7 @@ app-pwa-install-banner {
   gap: 0.45rem;
 }
 
+/* Hide mobile icon glyphs on desktop-sized layouts. */
 .mobile-icon-button__icon {
   display: none;
   width: 1rem;
@@ -96,34 +111,37 @@ app-pwa-install-banner {
   flex: 0 0 auto;
 }
 
-.transactions-table {
-  --mobile-action-col-width: 5.15rem;
-}
-
+/* Default desktop width for transaction table date columns. */
 .transactions-table .table-col--date {
   width: 5rem;
 }
 
+/* Default desktop width for transaction table amount columns. */
 .transactions-table .table-col--amount {
   width: 5rem;
 }
 
+/* Default desktop width for transaction table category columns. */
 .transactions-table .table-col--category {
   width: 7.5rem;
 }
 
+/* Default desktop width for transaction table actions columns. */
 .transactions-table .table-col--actions {
   width: 5rem;
 }
 
+/* Hide the mobile-only detail row until a mobile breakpoint enables it. */
 .transaction-detail-row {
   display: none;
 }
 
+/* Remove default cell padding from the expanded mobile detail row wrapper. */
 .transaction-detail-cell {
   padding: 0;
 }
 
+/* Stack extra transaction details vertically inside the mobile detail row. */
 .transaction-detail-grid {
   display: grid;
   gap: 0.55rem;
@@ -131,11 +149,13 @@ app-pwa-install-banner {
   background: #f8fcfd;
 }
 
+/* Stack each label/value pair inside the transaction detail row. */
 .transaction-detail-item {
   display: grid;
   gap: 0.3rem;
 }
 
+/* Style labels for the mobile transaction detail fields. */
 .transaction-detail-label {
   color: #4c6b79;
   font-size: 0.76rem;
@@ -144,15 +164,19 @@ app-pwa-install-banner {
   text-transform: uppercase;
 }
 
+/* Allow long transaction detail text to wrap instead of overflowing. */
 .transaction-detail-value {
   overflow-wrap: anywhere;
 }
 
+/* Stretch mobile detail-row selects to the full available width. */
 .transaction-detail-item select {
   width: 100%;
 }
 
+/* Mobile-only global layout adjustments for screens 860px wide or smaller. */
 @media (max-width: 860px) {
+  /* Make root Angular hosts fill the viewport width on narrow screens. */
   app-root,
   app-dashboard-page,
   app-transactions-page,
@@ -162,21 +186,25 @@ app-pwa-install-banner {
     max-width: 100%;
   }
 
+  /* Prevent the main routed content area from inheriting desktop width limits. */
   app-root .content {
     width: 100%;
     max-width: 100%;
   }
 
+  /* Reduce side padding for shell-level banners on mobile. */
   .shell-banner,
   .shell-status {
     padding: 0 1rem;
   }
 
+  /* Hide desktop session text/actions when the mobile dropdown is active. */
   .session-chip__email,
   .session-chip__inline-actions {
     display: none;
   }
 
+  /* Show the email-triggered session menu button on mobile. */
   .session-chip__toggle {
     display: inline-flex;
     flex: 1 1 auto;
@@ -184,11 +212,13 @@ app-pwa-install-banner {
     min-width: 0;
   }
 
+  /* Truncate long email text inside the mobile session toggle. */
   .session-chip__toggle span {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
+  /* Render the mobile session actions as a floating dropdown card. */
   .session-menu {
     position: absolute;
     top: calc(100% + 0.45rem);
@@ -204,10 +234,12 @@ app-pwa-install-banner {
     box-shadow: 0 12px 30px rgba(18, 49, 63, 0.12);
   }
 
+  /* Let each action inside the session dropdown fill the dropdown width. */
   .session-menu__item {
     width: 100%;
   }
 
+  /* Convert shared mobile-icon buttons to compact circular buttons. */
   .mobile-icon-button {
     width: 2.5rem;
     min-width: 2.5rem;
@@ -216,14 +248,17 @@ app-pwa-install-banner {
     border-radius: 999px;
   }
 
+  /* Hide text labels once a mobile-icon button becomes icon-only. */
   .mobile-icon-button__label {
     display: none;
   }
 
+  /* Reveal the icon glyph on icon-only mobile buttons. */
   .mobile-icon-button__icon {
     display: block;
   }
 
+  /* Prevent mobile icon buttons in common form/action rows from stretching. */
   .account-create .mobile-icon-button,
   .import-form .mobile-icon-button,
   .form-footer .mobile-icon-button,
@@ -232,77 +267,101 @@ app-pwa-install-banner {
   }
 }
 
+/* Tablet/mobile transaction table behavior for screens 1000px wide or smaller. */
 @media (max-width: 1000px) {
+  /* Hide the desktop description column when the detail row takes over. */
   .col-description,
   .description-cell {
     display: none;
   }
 
+  /* Remove column width reservation for the hidden description column. */
   .transactions-table .table-col--description {
     width: 0;
   }
 
+  /* Give the visible portrait/mobile date column one-third of table width. */
   .transactions-table .table-col--date {
-    width: calc((100% - var(--mobile-action-col-width)) / 2);
+    width: 33.333333%;
   }
 
+  /* Give the visible portrait/mobile amount column one-third of table width. */
   .transactions-table .table-col--amount {
-    width: calc((100% - var(--mobile-action-col-width)) / 2);
+    width: 33.333333%;
   }
 
+  /* Give the visible portrait/mobile actions column one-third of table width. */
   .transactions-table .table-col--actions {
-    width: var(--mobile-action-col-width);
+    width: 33.333333%;
   }
 
+  /* Merge the main transaction row visually into the detail row below it. */
   .transaction-main-row td {
     border-bottom: none;
   }
 
+  /* Show the extra detail row for each transaction on mobile/tablet widths. */
   .transaction-detail-row {
     display: table-row;
   }
 
+  /* Restore the bottom border on the full-width mobile detail row cell. */
   .transaction-detail-cell {
     padding: 0;
     border-bottom: 1px solid #e8eff1;
   }
 }
 
+/* Landscape-only mobile/tablet transaction layout with category back in-row. */
 @media (max-width: 1000px) and (orientation: landscape) {
+  /* Show the desktop category header/cell again in landscape mode. */
   .transactions-table .col-category,
   .transactions-table .category-cell {
     display: table-cell;
   }
 
+  /* Give the landscape date column one-quarter of the visible row width. */
   .transactions-table .table-col--date {
-    width: calc((100% - var(--mobile-action-col-width)) / 3);
+    width: 25%;
   }
 
+  /* Give the landscape amount column one-quarter of the visible row width. */
   .transactions-table .table-col--amount {
-    width: calc((100% - var(--mobile-action-col-width)) / 3);
+    width: 25%;
   }
 
+  /* Give the landscape category column one-quarter of the visible row width. */
   .transactions-table .table-col--category {
-    width: calc((100% - var(--mobile-action-col-width)) / 3);
+    width: 25%;
   }
 
+  /* Give the landscape actions column one-quarter of the visible row width. */
+  .transactions-table .table-col--actions {
+    width: 25%;
+  }
+
+  /* Let the inline category select fully occupy the restored category column. */
   .transactions-table .category-cell select {
     display: block;
     width: 100%;
     min-width: 0;
   }
 
+  /* Hide category from the detail row once it is visible in the main row again. */
   .transaction-detail-item--category {
     display: none;
   }
 }
 
+/* Portrait-only mobile/tablet transaction layout with category in the detail row. */
 @media (max-width: 1000px) and (orientation: portrait) {
+  /* Hide the category header/cell from the main table row in portrait mode. */
   .transactions-table .col-category,
   .transactions-table .category-cell {
     display: none;
   }
 
+  /* Remove width reservation for the hidden portrait-mode category column. */
   .transactions-table .table-col--category {
     width: 0;
   }

@@ -1,3 +1,4 @@
+/* Outer card for the dashboard page. */
 .panel {
   background: #fff;
   border: 1px solid #d7e3e8;
@@ -5,6 +6,7 @@
   padding: 1rem;
 }
 
+/* Top toolbar for month controls and the page heading. */
 .toolbar {
   display: flex;
   align-items: flex-end;
@@ -13,16 +15,19 @@
   margin-bottom: 1rem;
 }
 
+/* Remove default spacing from the dashboard page heading inside the toolbar. */
 .toolbar h1 {
   margin: 0;
 }
 
+/* Flexible row of month/filter controls in the toolbar. */
 .controls {
   display: flex;
   gap: 0.7rem;
   flex-wrap: wrap;
 }
 
+/* Stack dashboard field labels above their inputs. */
 label {
   display: grid;
   gap: 0.2rem;
@@ -30,12 +35,14 @@ label {
   color: #4c6b79;
 }
 
+/* Base styling for dashboard text and month inputs. */
 input {
   border: 1px solid #cbd9de;
   border-radius: 8px;
   padding: 0.45rem 0.55rem;
 }
 
+/* Default styling for dashboard page action buttons. */
 button {
   border: 0;
   background: #0e7490;
@@ -46,6 +53,7 @@ button {
   align-self: end;
 }
 
+/* Responsive summary-card grid for high-level dashboard metrics. */
 .cards {
   display: grid;
   grid-template-columns: repeat(4, minmax(140px, 1fr));
@@ -53,24 +61,28 @@ button {
   margin: 0.7rem 0 1rem;
 }
 
+/* Individual summary cards inside the metrics grid. */
 .cards article {
   background: #f1f6f8;
   border-radius: 10px;
   padding: 0.75rem;
 }
 
+/* Metric labels shown inside summary cards. */
 .cards h2 {
   margin: 0 0 0.2rem;
   font-size: 0.9rem;
   color: #4e6b77;
 }
 
+/* Metric values shown inside summary cards. */
 .cards p {
   margin: 0;
   font-size: 1.3rem;
   font-weight: 700;
 }
 
+/* Grid for grouped totals and balance summary cards. */
 .totals-grid {
   display: grid;
   gap: 0.75rem;
@@ -78,6 +90,7 @@ button {
   margin-bottom: 1rem;
 }
 
+/* Individual cards within the totals summary grid. */
 .totals-grid article {
   background: #f8fbfc;
   border: 1px solid #d7e3e8;
@@ -85,28 +98,33 @@ button {
   padding: 0.8rem;
 }
 
+/* Remove extra top spacing from totals-card headings. */
 .totals-grid h3 {
   margin-top: 0;
 }
 
+/* Key/value row used inside totals summary cards. */
 .kv {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.25rem;
 }
 
+/* Two-column layout for the dashboard's detail tables. */
 .tables {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
+/* Base styling for dashboard detail tables. */
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
 }
 
+/* Shared table header/body cell styling for dashboard tables. */
 th,
 td {
   border-bottom: 1px solid #ebf0f2;
@@ -114,17 +132,21 @@ td {
   text-align: left;
 }
 
+/* Error message styling for dashboard API failures. */
 .error {
   color: #b91c1c;
 }
 
+/* Mobile/tablet dashboard layout changes for screens 900px and smaller. */
 @media (max-width: 900px) {
+  /* Collapse cards, totals, and tables into single-column layouts. */
   .cards,
   .totals-grid,
   .tables {
     grid-template-columns: 1fr;
   }
 
+  /* Stack the toolbar heading and controls vertically on smaller screens. */
   .toolbar {
     flex-direction: column;
     align-items: flex-start;
