@@ -73,8 +73,42 @@
   <p class="error" *ngIf="error">{{ error }}</p>
   <p *ngIf="loading">Loading...</p>
 
+  <div class="mobile-transaction-tabs" role="tablist" aria-label="Transaction sections">
+    <button
+      type="button"
+      class="mobile-transaction-tab"
+      id="expense-transactions-tab"
+      role="tab"
+      [class.mobile-transaction-tab--active]="activeMobileTransactionTab === 'EXPENSE'"
+      [attr.aria-selected]="activeMobileTransactionTab === 'EXPENSE'"
+      aria-controls="expense-transactions-panel"
+      (click)="setActiveMobileTransactionTab('EXPENSE')"
+    >
+      Expenses
+    </button>
+    <button
+      type="button"
+      class="mobile-transaction-tab"
+      id="income-transactions-tab"
+      role="tab"
+      [class.mobile-transaction-tab--active]="activeMobileTransactionTab === 'INCOME'"
+      [attr.aria-selected]="activeMobileTransactionTab === 'INCOME'"
+      aria-controls="income-transactions-panel"
+      (click)="setActiveMobileTransactionTab('INCOME')"
+    >
+      Income
+    </button>
+  </div>
+
   <div class="grid">
-    <article>
+    <article
+      id="expense-transactions-panel"
+      class="transaction-panel"
+      role="tabpanel"
+      aria-labelledby="expense-transactions-tab"
+      [class.transaction-panel--active]="activeMobileTransactionTab === 'EXPENSE'"
+      [class.transaction-panel--inactive]="activeMobileTransactionTab !== 'EXPENSE'"
+    >
       <div class="section-bar section-bar--dialog">
         <h2 class="section-heading">
           <span class="account-accent">{{ selectedAccountName }}</span> Account Expenses
@@ -216,7 +250,14 @@
       </div>
     </article>
 
-    <article>
+    <article
+      id="income-transactions-panel"
+      class="transaction-panel"
+      role="tabpanel"
+      aria-labelledby="income-transactions-tab"
+      [class.transaction-panel--active]="activeMobileTransactionTab === 'INCOME'"
+      [class.transaction-panel--inactive]="activeMobileTransactionTab !== 'INCOME'"
+    >
       <div class="section-bar section-bar--dialog">
         <h2 class="section-heading">
           <span class="account-accent">{{ selectedAccountName }}</span> Account Income

@@ -78,6 +78,7 @@ export class TransactionsPageComponent implements OnInit {
   showIncomeDialog = false;
   showCategoryDialog = false;
   categoryDialogType: TransactionType | null = null;
+  activeMobileTransactionTab: TransactionType = 'EXPENSE';
 
   expenseForm: NewTransactionForm = this.createDefaultForm();
   incomeForm: NewTransactionForm = this.createDefaultForm();
@@ -141,10 +142,12 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   addExpense(): void {
+    this.activeMobileTransactionTab = 'EXPENSE';
     this.addTransaction('EXPENSE', this.expenseForm);
   }
 
   addIncome(): void {
+    this.activeMobileTransactionTab = 'INCOME';
     this.addTransaction('INCOME', this.incomeForm);
   }
 
@@ -173,6 +176,7 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openExpenseDialog(): void {
+    this.activeMobileTransactionTab = 'EXPENSE';
     this.showExpenseDialog = true;
     this.error = '';
     this.syncDialogCategoryState('EXPENSE');
@@ -186,9 +190,14 @@ export class TransactionsPageComponent implements OnInit {
   }
 
   openIncomeDialog(): void {
+    this.activeMobileTransactionTab = 'INCOME';
     this.showIncomeDialog = true;
     this.error = '';
     this.syncDialogCategoryState('INCOME');
+  }
+
+  setActiveMobileTransactionTab(type: TransactionType): void {
+    this.activeMobileTransactionTab = type;
   }
 
   closeIncomeDialog(): void {

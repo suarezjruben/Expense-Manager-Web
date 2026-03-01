@@ -180,6 +180,27 @@
   gap: 1rem;
 }
 
+/* Hide the mobile transaction tab strip until the mobile/tablet breakpoint. */
+.mobile-transaction-tabs {
+  display: none;
+}
+
+/* Base tab button styling for the mobile expense/income switcher. */
+.mobile-transaction-tab {
+  flex: 1 1 0;
+  border: 1px solid #c9dce3;
+  background: #edf6f8;
+  color: #0f4f6d;
+  font-weight: 700;
+}
+
+/* Active-state styling for the selected mobile transaction tab. */
+.mobile-transaction-tab--active {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #fff;
+}
+
 /* Base card styling for each expense/income section and import-adjacent articles. */
 article {
   border: 1px solid #dde7ea;
@@ -512,6 +533,18 @@ th {
   /* Collapse expense and income sections to one column on smaller screens. */
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Show the mobile-only transaction tab strip above the stacked tables. */
+  .mobile-transaction-tabs {
+    display: flex;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Hide the inactive transaction panel so only one table is shown at a time on mobile. */
+  .transaction-panel--inactive {
+    display: none;
   }
 
   /* Collapse add-transaction fields to a single column on smaller screens. */
