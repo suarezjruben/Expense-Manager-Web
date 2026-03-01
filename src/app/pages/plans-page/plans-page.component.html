@@ -1,7 +1,7 @@
 <section class="panel">
   <div class="toolbar">
     <h1>Plans & Categories</h1>
-    <label>
+    <label class="toolbar-field">
       Month
       <input type="month" [(ngModel)]="month" (change)="onMonthChanged()" />
     </label>
@@ -10,107 +10,402 @@
   <p class="error" *ngIf="error">{{ error }}</p>
   <p *ngIf="loading">Loading...</p>
 
+  <div class="mobile-section-tabs" role="tablist" aria-label="Plans and categories sections">
+    <button
+      type="button"
+      id="expense-plans-tab"
+      role="tab"
+      class="mobile-section-tab"
+      [class.mobile-section-tab--active]="activeMobileSectionTab === 'EXPENSE_PLANS'"
+      [attr.aria-selected]="activeMobileSectionTab === 'EXPENSE_PLANS'"
+      aria-controls="expense-plans-panel"
+      (click)="setActiveMobileSectionTab('EXPENSE_PLANS')"
+    >
+      Expense Plans
+    </button>
+    <button
+      type="button"
+      id="income-plans-tab"
+      role="tab"
+      class="mobile-section-tab"
+      [class.mobile-section-tab--active]="activeMobileSectionTab === 'INCOME_PLANS'"
+      [attr.aria-selected]="activeMobileSectionTab === 'INCOME_PLANS'"
+      aria-controls="income-plans-panel"
+      (click)="setActiveMobileSectionTab('INCOME_PLANS')"
+    >
+      Income Plans
+    </button>
+    <button
+      type="button"
+      id="expense-categories-tab"
+      role="tab"
+      class="mobile-section-tab"
+      [class.mobile-section-tab--active]="activeMobileSectionTab === 'EXPENSE_CATEGORIES'"
+      [attr.aria-selected]="activeMobileSectionTab === 'EXPENSE_CATEGORIES'"
+      aria-controls="expense-categories-panel"
+      (click)="setActiveMobileSectionTab('EXPENSE_CATEGORIES')"
+    >
+      Expense Categories
+    </button>
+    <button
+      type="button"
+      id="income-categories-tab"
+      role="tab"
+      class="mobile-section-tab"
+      [class.mobile-section-tab--active]="activeMobileSectionTab === 'INCOME_CATEGORIES'"
+      [attr.aria-selected]="activeMobileSectionTab === 'INCOME_CATEGORIES'"
+      aria-controls="income-categories-panel"
+      (click)="setActiveMobileSectionTab('INCOME_CATEGORIES')"
+    >
+      Income Categories
+    </button>
+  </div>
+
   <div class="layout">
-    <article>
+    <article
+      id="expense-plans-panel"
+      role="tabpanel"
+      aria-labelledby="expense-plans-tab"
+      class="section-card plans-section"
+      [class.plans-section--active]="activeMobileSectionTab === 'EXPENSE_PLANS'"
+      [class.plans-section--inactive]="activeMobileSectionTab !== 'EXPENSE_PLANS'"
+    >
       <h2>Expense Plans</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Planned</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of expensePlans">
-            <td>{{ row.categoryName }}</td>
-            <td>
-              <input type="number" step="0.01" min="0" [(ngModel)]="row.plannedAmount" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <button type="button" (click)="savePlans('EXPENSE')">Save Expense Plans</button>
+      <div class="table-wrap">
+        <table class="plans-table">
+          <thead>
+            <tr>
+              <th class="col-name">Category</th>
+              <th class="col-amount">Planned</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of expensePlans">
+              <td class="name-cell">{{ row.categoryName }}</td>
+              <td class="amount-cell">
+                <input type="number" step="0.01" min="0" [(ngModel)]="row.plannedAmount" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-actions">
+        <button
+          type="button"
+          class="icon-button"
+          [title]="isSavingPlanType('EXPENSE') ? 'Saving expense plans' : 'Save All Expense Plans'"
+          [attr.aria-label]="isSavingPlanType('EXPENSE') ? 'Saving expense plans' : 'Save All Expense Plans'"
+          (click)="savePlansAndStayOnTab('EXPENSE')"
+          [disabled]="!hasPendingPlanChanges('EXPENSE') || hasInvalidPlanChanges('EXPENSE') || isSavingPlanType('EXPENSE') || isDeletingPlanType('EXPENSE')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="icon-button danger"
+          [title]="isDeletingPlanType('EXPENSE') ? 'Deleting expense plans' : 'Delete All Expense Plans'"
+          [attr.aria-label]="isDeletingPlanType('EXPENSE') ? 'Deleting expense plans' : 'Delete All Expense Plans'"
+          (click)="deleteAllPlans('EXPENSE')"
+          [disabled]="!hasPlansToDelete('EXPENSE') || isSavingPlanType('EXPENSE') || isDeletingPlanType('EXPENSE')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </div>
     </article>
 
-    <article>
+    <article
+      id="income-plans-panel"
+      role="tabpanel"
+      aria-labelledby="income-plans-tab"
+      class="section-card plans-section"
+      [class.plans-section--active]="activeMobileSectionTab === 'INCOME_PLANS'"
+      [class.plans-section--inactive]="activeMobileSectionTab !== 'INCOME_PLANS'"
+    >
       <h2>Income Plans</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Planned</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of incomePlans">
-            <td>{{ row.categoryName }}</td>
-            <td>
-              <input type="number" step="0.01" min="0" [(ngModel)]="row.plannedAmount" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <button type="button" (click)="savePlans('INCOME')">Save Income Plans</button>
+      <div class="table-wrap">
+        <table class="plans-table">
+          <thead>
+            <tr>
+              <th class="col-name">Category</th>
+              <th class="col-amount">Planned</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of incomePlans">
+              <td class="name-cell">{{ row.categoryName }}</td>
+              <td class="amount-cell">
+                <input type="number" step="0.01" min="0" [(ngModel)]="row.plannedAmount" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-actions">
+        <button
+          type="button"
+          class="icon-button"
+          [title]="isSavingPlanType('INCOME') ? 'Saving income plans' : 'Save All Income Plans'"
+          [attr.aria-label]="isSavingPlanType('INCOME') ? 'Saving income plans' : 'Save All Income Plans'"
+          (click)="savePlansAndStayOnTab('INCOME')"
+          [disabled]="!hasPendingPlanChanges('INCOME') || hasInvalidPlanChanges('INCOME') || isSavingPlanType('INCOME') || isDeletingPlanType('INCOME')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="icon-button danger"
+          [title]="isDeletingPlanType('INCOME') ? 'Deleting income plans' : 'Delete All Income Plans'"
+          [attr.aria-label]="isDeletingPlanType('INCOME') ? 'Deleting income plans' : 'Delete All Income Plans'"
+          (click)="deleteAllPlans('INCOME')"
+          [disabled]="!hasPlansToDelete('INCOME') || isSavingPlanType('INCOME') || isDeletingPlanType('INCOME')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </div>
     </article>
   </div>
 
   <div class="layout">
-    <article>
+    <article
+      id="expense-categories-panel"
+      role="tabpanel"
+      aria-labelledby="expense-categories-tab"
+      class="section-card plans-section"
+      [class.plans-section--active]="activeMobileSectionTab === 'EXPENSE_CATEGORIES'"
+      [class.plans-section--inactive]="activeMobileSectionTab !== 'EXPENSE_CATEGORIES'"
+    >
       <h2>Expense Categories</h2>
       <div class="new-item">
         <input [(ngModel)]="newExpenseCategory" placeholder="New category name" />
-        <button type="button" (click)="addCategory('EXPENSE')">Add</button>
+        <button
+          type="button"
+          class="icon-button"
+          title="Add Expense Category"
+          aria-label="Add Expense Category"
+          (click)="addCategory('EXPENSE')"
+          [disabled]="!newExpenseCategory.trim() || isSavingCategoryType('EXPENSE') || isDeletingCategoryType('EXPENSE')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
+          </svg>
+        </button>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Order</th>
-            <th>Active</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let category of expenseCategories">
-            <td><input [(ngModel)]="category.name" /></td>
-            <td><input type="number" min="0" [(ngModel)]="category.sortOrder" /></td>
-            <td><input type="checkbox" [(ngModel)]="category.active" /></td>
-            <td>
-              <button type="button" (click)="saveCategory(category)">Save</button>
-              <button type="button" class="danger" (click)="deleteCategory(category)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table class="categories-table">
+          <thead>
+            <tr>
+              <th class="col-name">Name</th>
+              <th class="col-order">Order</th>
+              <th class="col-active">Active</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let category of expenseCategories">
+              <td class="name-cell"><input [(ngModel)]="category.name" /></td>
+              <td class="order-cell"><input type="number" min="0" [(ngModel)]="category.sortOrder" /></td>
+              <td class="active-cell"><input type="checkbox" [(ngModel)]="category.active" /></td>
+              <td class="actions-cell">
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="icon-button"
+                    [title]="isSavingCategory(category) ? 'Saving expense category' : 'Save Expense Category'"
+                    [attr.aria-label]="isSavingCategory(category) ? 'Saving expense category' : 'Save Expense Category'"
+                    (click)="saveCategory(category)"
+                    [disabled]="!hasCategoryChanged(category) || !category.name.trim() || isSavingCategoryType('EXPENSE') || isDeletingCategoryType('EXPENSE')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-button danger"
+                    [title]="isDeletingCategory(category) ? 'Deleting expense category' : 'Delete Expense Category'"
+                    [attr.aria-label]="isDeletingCategory(category) ? 'Deleting expense category' : 'Delete Expense Category'"
+                    (click)="deleteCategory(category)"
+                    [disabled]="isSavingCategoryType('EXPENSE') || isDeletingCategoryType('EXPENSE')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-actions">
+        <button
+          type="button"
+          class="icon-button"
+          [title]="isSavingCategoryType('EXPENSE') ? 'Saving expense categories' : 'Save All Expense Categories'"
+          [attr.aria-label]="isSavingCategoryType('EXPENSE') ? 'Saving expense categories' : 'Save All Expense Categories'"
+          (click)="saveAllCategories('EXPENSE')"
+          [disabled]="!hasPendingCategoryChanges('EXPENSE') || hasInvalidCategoryChanges('EXPENSE') || isSavingCategoryType('EXPENSE') || isDeletingCategoryType('EXPENSE')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="icon-button danger"
+          [title]="isDeletingCategoryType('EXPENSE') ? 'Deleting expense categories' : 'Delete All Expense Categories'"
+          [attr.aria-label]="isDeletingCategoryType('EXPENSE') ? 'Deleting expense categories' : 'Delete All Expense Categories'"
+          (click)="deleteAllCategories('EXPENSE')"
+          [disabled]="!hasCategories('EXPENSE') || isSavingCategoryType('EXPENSE') || isDeletingCategoryType('EXPENSE')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </div>
     </article>
 
-    <article>
+    <article
+      id="income-categories-panel"
+      role="tabpanel"
+      aria-labelledby="income-categories-tab"
+      class="section-card plans-section"
+      [class.plans-section--active]="activeMobileSectionTab === 'INCOME_CATEGORIES'"
+      [class.plans-section--inactive]="activeMobileSectionTab !== 'INCOME_CATEGORIES'"
+    >
       <h2>Income Categories</h2>
       <div class="new-item">
         <input [(ngModel)]="newIncomeCategory" placeholder="New category name" />
-        <button type="button" (click)="addCategory('INCOME')">Add</button>
+        <button
+          type="button"
+          class="icon-button"
+          title="Add Income Category"
+          aria-label="Add Income Category"
+          (click)="addCategory('INCOME')"
+          [disabled]="!newIncomeCategory.trim() || isSavingCategoryType('INCOME') || isDeletingCategoryType('INCOME')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
+          </svg>
+        </button>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Order</th>
-            <th>Active</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let category of incomeCategories">
-            <td><input [(ngModel)]="category.name" /></td>
-            <td><input type="number" min="0" [(ngModel)]="category.sortOrder" /></td>
-            <td><input type="checkbox" [(ngModel)]="category.active" /></td>
-            <td>
-              <button type="button" (click)="saveCategory(category)">Save</button>
-              <button type="button" class="danger" (click)="deleteCategory(category)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table class="categories-table">
+          <thead>
+            <tr>
+              <th class="col-name">Name</th>
+              <th class="col-order">Order</th>
+              <th class="col-active">Active</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let category of incomeCategories">
+              <td class="name-cell"><input [(ngModel)]="category.name" /></td>
+              <td class="order-cell"><input type="number" min="0" [(ngModel)]="category.sortOrder" /></td>
+              <td class="active-cell"><input type="checkbox" [(ngModel)]="category.active" /></td>
+              <td class="actions-cell">
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="icon-button"
+                    [title]="isSavingCategory(category) ? 'Saving income category' : 'Save Income Category'"
+                    [attr.aria-label]="isSavingCategory(category) ? 'Saving income category' : 'Save Income Category'"
+                    (click)="saveCategory(category)"
+                    [disabled]="!hasCategoryChanged(category) || !category.name.trim() || isSavingCategoryType('INCOME') || isDeletingCategoryType('INCOME')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-button danger"
+                    [title]="isDeletingCategory(category) ? 'Deleting income category' : 'Delete Income Category'"
+                    [attr.aria-label]="isDeletingCategory(category) ? 'Deleting income category' : 'Delete Income Category'"
+                    (click)="deleteCategory(category)"
+                    [disabled]="isSavingCategoryType('INCOME') || isDeletingCategoryType('INCOME')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-actions">
+        <button
+          type="button"
+          class="icon-button"
+          [title]="isSavingCategoryType('INCOME') ? 'Saving income categories' : 'Save All Income Categories'"
+          [attr.aria-label]="isSavingCategoryType('INCOME') ? 'Saving income categories' : 'Save All Income Categories'"
+          (click)="saveAllCategories('INCOME')"
+          [disabled]="!hasPendingCategoryChanges('INCOME') || hasInvalidCategoryChanges('INCOME') || isSavingCategoryType('INCOME') || isDeletingCategoryType('INCOME')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="icon-button danger"
+          [title]="isDeletingCategoryType('INCOME') ? 'Deleting income categories' : 'Delete All Income Categories'"
+          [attr.aria-label]="isDeletingCategoryType('INCOME') ? 'Deleting income categories' : 'Delete All Income Categories'"
+          (click)="deleteAllCategories('INCOME')"
+          [disabled]="!hasCategories('INCOME') || isSavingCategoryType('INCOME') || isDeletingCategoryType('INCOME')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </div>
     </article>
   </div>
 </section>

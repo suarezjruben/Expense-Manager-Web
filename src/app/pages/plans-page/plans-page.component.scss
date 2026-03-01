@@ -1,5 +1,7 @@
 /* Outer card for the plans page content. */
 .panel {
+  width: 100%;
+  min-width: 0;
   background: #fff;
   border: 1px solid #d7e3e8;
   border-radius: 14px;
@@ -11,7 +13,21 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  gap: 0.75rem;
+  min-width: 0;
   margin-bottom: 1rem;
+}
+
+/* Keep the page heading tight inside the toolbar. */
+.toolbar h1 {
+  margin: 0;
+}
+
+/* Stack the month label above its input and allow it to shrink safely. */
+.toolbar-field {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
 }
 
 /* Two-column layout for expense and income planning sections. */
@@ -19,11 +35,33 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  min-width: 0;
   margin-bottom: 1rem;
+}
+
+/* Hide the mobile section tab strip on desktop and tablet landscape layouts. */
+.mobile-section-tabs {
+  display: none;
+}
+
+/* Base button styling for the mobile plans/categories tab switcher. */
+.mobile-section-tab {
+  border: 1px solid #c9dce3;
+  background: #edf6f8;
+  color: #0f4f6d;
+  font-weight: 700;
+}
+
+/* Selected state for the active mobile plans/categories tab. */
+.mobile-section-tab--active {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #fff;
 }
 
 /* Base card styling for plan and category management sections. */
 article {
+  min-width: 0;
   border: 1px solid #dde7ea;
   border-radius: 12px;
   padding: 0.8rem;
@@ -33,15 +71,26 @@ article {
 /* Row for adding a new category or plan-related item. */
 .new-item {
   display: flex;
+  align-items: center;
+  min-width: 0;
   gap: 0.5rem;
   margin-bottom: 0.6rem;
 }
 
 /* Base input styling for the plans page. */
 input {
+  width: 100%;
+  max-width: 100%;
   border: 1px solid #c8d8de;
   border-radius: 8px;
   padding: 0.35rem 0.45rem;
+  font: inherit;
+}
+
+/* Let checkboxes keep their natural compact size inside category rows. */
+input[type='checkbox'] {
+  width: auto;
+  max-width: none;
 }
 
 /* Default button styling for plans page actions. */
@@ -52,6 +101,27 @@ button {
   border-radius: 8px;
   padding: 0.45rem 0.7rem;
   cursor: pointer;
+  font: inherit;
+}
+
+/* Circular icon button styling aligned with transaction-row action buttons. */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: 1px solid #c7dae1;
+  border-radius: 999px;
+  background: #fff;
+  color: #0f766e;
+}
+
+/* Size SVG icons inside plans-page icon buttons. */
+.icon-button svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 /* Destructive button variant for delete actions. */
@@ -59,12 +129,41 @@ button.danger {
   background: #b91c1c;
 }
 
+/* Destructive appearance for delete icon buttons. */
+.icon-button.danger {
+  background: #fff;
+  color: #b91c1c;
+  border: 1px solid #efc0c0;
+}
+
+/* Let new-category inputs grow while keeping the add button visible. */
+.new-item input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Keep the add-category button from shrinking into illegible widths. */
+.new-item button {
+  flex: 0 0 auto;
+}
+
+/* Scroll-safe wrapper that keeps wide tables inside the section card. */
+.table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e0eaed;
+  border-radius: 10px;
+  background: #fff;
+}
+
 /* Base styling for plan/category tables. */
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
+  table-layout: fixed;
 }
 
 /* Shared cell styling for plan/category tables. */
@@ -73,6 +172,70 @@ td {
   border-bottom: 1px solid #e8eff1;
   padding: 0.35rem;
   text-align: left;
+  vertical-align: middle;
+}
+
+/* Prevent table headers from wrapping awkwardly on smaller widths. */
+th {
+  white-space: nowrap;
+}
+
+/* Allow category names to wrap instead of forcing the table wider. */
+.name-cell {
+  overflow-wrap: anywhere;
+}
+
+/* Keep planned-amount inputs at a usable but compact width. */
+.plans-table .col-amount {
+  width: 8rem;
+}
+
+/* Keep category sort-order inputs compact. */
+.categories-table .col-order {
+  width: 5.5rem;
+}
+
+/* Narrow checkbox column for category active state. */
+.categories-table .col-active {
+  width: 4.5rem;
+  text-align: center;
+}
+
+/* Reserve a compact action column for save/delete controls. */
+.categories-table .col-actions {
+  width: 5.5rem;
+}
+
+/* Center checkbox cells within the active column. */
+.active-cell {
+  text-align: center;
+}
+
+/* Keep action buttons grouped and wrapped inside their cell. */
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+/* Footer action row below each plans/categories table. */
+.table-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+
+/* Muted disabled state for plans-page icon buttons and footer actions. */
+.icon-button:disabled,
+.table-actions button:disabled,
+.new-item button:disabled {
+  background: #9ca3af;
+  color: #f8fafc;
+  border-color: #9ca3af;
+  cursor: default;
+  pointer-events: none;
 }
 
 /* Error message styling for plans page failures. */
@@ -82,8 +245,63 @@ td {
 
 /* Mobile/tablet layout override for screens 1000px and smaller. */
 @media (max-width: 1000px) {
+  /* Stack the toolbar heading and month picker vertically. */
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Let the month field consume the available toolbar width. */
+  .toolbar-field {
+    width: 100%;
+  }
+
+  /* Show the mobile tab strip as a compact two-column grid above the sections. */
+  .mobile-section-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+  }
+
   /* Collapse the two planning columns into a single stacked column. */
   .layout {
     grid-template-columns: 1fr;
+  }
+
+  /* Hide inactive section cards so only one panel is visible at a time on mobile. */
+  .plans-section--inactive {
+    display: none;
+  }
+
+  /* Tighten section card padding slightly on smaller screens. */
+  article {
+    padding: 0.7rem;
+  }
+
+  /* Reduce cell padding to keep more usable width for inputs. */
+  th,
+  td {
+    padding: 0.3rem;
+  }
+}
+
+/* Portrait mobile overrides to keep controls comfortably inside the main content width. */
+@media (max-width: 1000px) and (orientation: portrait) {
+  /* Keep the add-category input row compact now that the add action becomes icon-only on mobile. */
+  .new-item {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Narrow the category action column and allow buttons to stack vertically. */
+  .categories-table .col-actions {
+    width: 5.25rem;
+  }
+
+  /* Keep icon-only row action buttons in a compact wrapped row on portrait mobile. */
+  .row-actions {
+    flex-direction: row;
+    justify-content: center;
   }
 }

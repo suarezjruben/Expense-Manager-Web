@@ -67,12 +67,20 @@ export class ApiService {
     return defer(() => from(this.deleteCategoryAsync(id)));
   }
 
+  deleteCategoriesByType(type: CategoryType) {
+    return defer(() => from(this.deleteCategoriesByTypeAsync(type)));
+  }
+
   listPlans(month: string, type: CategoryType) {
     return defer(() => from(this.listPlansAsync(month, type)));
   }
 
   upsertPlans(month: string, type: CategoryType, request: PlanItemRequest[]) {
     return defer(() => from(this.upsertPlansAsync(month, type, request)));
+  }
+
+  deletePlans(month: string, type: CategoryType) {
+    return defer(() => from(this.deletePlansAsync(month, type)));
   }
 
   listTransactions(month: string, type: TransactionType, accountId?: number) {
@@ -293,6 +301,33 @@ export class ApiService {
     this.throwIfError(error);
   }
 
+  private async deleteCategoriesByTypeAsync(type: CategoryType): Promise<void> {
+    const userId = await this.supabase.getRequiredUserId();
+    const categories = await this.listCategoryRows(userId, type);
+
+    for (const category of categories) {
+      const [planCount, transactionCount] = await Promise.all([
+        this.countRows('plans', userId, category.id),
+        this.countRows('transactions', userId, category.id)
+      ]);
+
+      if (planCount > 0 || transactionCount > 0) {
+        throw new Error(`Category is referenced by plans or transactions and cannot be deleted: ${category.name}`);
+      }
+    }
+
+    if (!categories.length) {
+      return;
+    }
+
+    const { error } = await this.supabase.client
+      .from('categories')
+      .delete()
+      .eq('user_id', userId)
+      .eq('type', type);
+    this.throwIfError(error);
+  }
+
   private async listPlansAsync(month: string, type: CategoryType): Promise<PlanItemDto[]> {
     this.validateMonth(month);
     const userId = await this.supabase.getRequiredUserId();
@@ -344,6 +379,27 @@ export class ApiService {
       });
       this.throwIfError(error);
     }
+
+    return this.listPlansAsync(month, type);
+  }
+
+  private async deletePlansAsync(month: string, type: CategoryType): Promise<PlanItemDto[]> {
+    this.validateMonth(month);
+    const userId = await this.supabase.getRequiredUserId();
+    const categories = await this.listCategoryRows(userId, type);
+
+    if (!categories.length) {
+      return [];
+    }
+
+    const categoryIds = categories.map((category) => category.id);
+    const { error } = await this.supabase.client
+      .from('plans')
+      .delete()
+      .eq('user_id', userId)
+      .eq('month_key', month)
+      .in('category_id', categoryIds);
+    this.throwIfError(error);
 
     return this.listPlansAsync(month, type);
   }
