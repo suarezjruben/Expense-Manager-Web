@@ -99,11 +99,45 @@ article {
   background: #f8fcfd;
 }
 
+.section-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.75rem;
+}
+
+.account-accent {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #dff6f2, #eef8ff);
+  color: #0f4f6d;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px #c7dde4;
+}
+
 form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.45rem;
   margin-bottom: 0.75rem;
+}
+
+.form-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.form-total {
+  margin: 0;
+  color: #0f4f6d;
+  font-size: 0.93rem;
+  white-space: nowrap;
 }
 
 input,
@@ -132,17 +166,90 @@ table {
   font-size: 0.88rem;
 }
 
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e0eaed;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.transactions-table {
+  min-width: 100%;
+  table-layout: fixed;
+}
+
+.col-date {
+  width: 6rem;
+}
+
+.col-amount {
+  width: 5rem;
+}
+
+.col-category {
+  width: 7.5rem;
+}
+
+.col-actions {
+  width: 5rem;
+}
+
 th,
 td {
   border-bottom: 1px solid #e8eff1;
   padding: 0.35rem;
   text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  white-space: nowrap;
+}
+
+.description-cell {
+  overflow-wrap: anywhere;
+}
+
+.category-cell select {
+  width: 100%;
+  min-width: 7rem;
+}
+
+.actions-cell {
+  vertical-align: middle;
 }
 
 .actions {
   display: flex;
   gap: 0.35rem;
   align-items: center;
+  justify-content: flex-end;
+  min-height: 100%;
+  white-space: nowrap;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: 1px solid #c7dae1;
+  border-radius: 999px;
+  background: #fff;
+  color: #0f766e;
+}
+
+.icon-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.icon-button.danger {
+  background: #fff;
+  color: #b91c1c;
+  border: 1px solid #efc0c0;
 }
 
 .actions button:disabled,
@@ -159,12 +266,6 @@ td {
   flex-wrap: wrap;
   gap: 0.45rem;
   margin-top: 0.45rem;
-}
-
-.table-total {
-  margin: 0.55rem 0 0;
-  text-align: right;
-  font-size: 0.93rem;
 }
 
 .error {
@@ -198,5 +299,18 @@ td {
 
   form {
     grid-template-columns: 1fr;
+  }
+
+  .form-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-total {
+    white-space: normal;
+  }
+
+  .col-category {
+    width: 8.5rem;
   }
 }

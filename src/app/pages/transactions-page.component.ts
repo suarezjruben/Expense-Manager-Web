@@ -130,6 +130,10 @@ export class TransactionsPageComponent implements OnInit {
     return this.incomes.reduce((sum, transaction) => sum + Number(transaction.amount ?? 0), 0);
   }
 
+  get selectedAccountName(): string {
+    return this.accounts.find((account) => account.id === this.selectedAccountId)?.name ?? 'Selected Account';
+  }
+
   deleteTransaction(type: TransactionType, id: number): void {
     if (!this.selectedAccountId) {
       this.error = 'Account is required';
@@ -268,7 +272,7 @@ export class TransactionsPageComponent implements OnInit {
     }
 
     const typeLabel = type === 'EXPENSE' ? 'expense' : 'income';
-    const accountName = this.accounts.find((account) => account.id === this.selectedAccountId)?.name ?? 'selected account';
+    const accountName = this.selectedAccountName;
     const countLabel = source.length === 1 ? 'transaction' : 'transactions';
     const confirmed = window.confirm(
       `Delete all ${source.length} ${typeLabel} ${countLabel} for ${this.month} in ${accountName}? This action cannot be undone.`

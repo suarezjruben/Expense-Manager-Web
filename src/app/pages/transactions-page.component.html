@@ -112,7 +112,9 @@
 
   <div class="grid">
     <article>
-      <h2>Add Expense</h2>
+      <h2 class="section-heading">
+        Add <span class="account-accent">{{ selectedAccountName }}</span> Account Expense
+      </h2>
       <form (ngSubmit)="addExpense()" #expenseFormRef="ngForm">
         <input name="expenseDate" type="date" [(ngModel)]="expenseForm.date" required />
         <input name="expenseAmount" type="number" step="0.01" min="0.01" [(ngModel)]="expenseForm.amount" required />
@@ -121,54 +123,74 @@
           <option [ngValue]="null">Select category</option>
           <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
         </select>
-        <button type="submit" [disabled]="expenseFormRef.invalid">Add Expense</button>
+        <div class="form-footer">
+          <button type="submit" [disabled]="expenseFormRef.invalid">Add Expense</button>
+          <p class="form-total"><strong>Total:</strong> {{ expenseTotal | currency }}</p>
+        </div>
       </form>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Account</th>
-            <th>Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let txn of expenses">
-            <td>{{ txn.date }}</td>
-            <td>{{ txn.amount | currency }}</td>
-            <td>{{ txn.description }}</td>
-            <td>{{ txn.accountName || '-' }}</td>
-            <td>
-              <select
-                [ngModel]="expenseCategoryByTransactionId[txn.id]"
-                [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event)"
-              >
-                <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
-              </select>
-            </td>
-            <td class="actions">
-              <button
-                type="button"
-                (click)="saveTransactionCategory('EXPENSE', txn)"
-                [disabled]="!hasCategoryChanged('EXPENSE', txn) || isSavingTransaction('EXPENSE', txn.id) || isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
-              >
-                {{ isSavingTransaction('EXPENSE', txn.id) ? 'Saving...' : 'Save' }}
-              </button>
-              <button
-                type="button"
-                class="danger"
-                (click)="deleteTransaction('EXPENSE', txn.id)"
-                [disabled]="isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th class="col-date">Date</th>
+              <th class="col-amount">Amount</th>
+              <th class="col-description">Description</th>
+              <th class="col-category">Category</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let txn of expenses">
+              <td>{{ txn.date }}</td>
+              <td>{{ txn.amount | currency }}</td>
+              <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
+              <td class="category-cell">
+                <select
+                  [ngModel]="expenseCategoryByTransactionId[txn.id]"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event)"
+                >
+                  <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
+                </select>
+              </td>
+              <td class="actions-cell">
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="icon-button"
+                    [title]="isSavingTransaction('EXPENSE', txn.id) ? 'Saving expense transaction' : 'Save expense transaction'"
+                    [attr.aria-label]="isSavingTransaction('EXPENSE', txn.id) ? 'Saving expense transaction' : 'Save expense transaction'"
+                    (click)="saveTransactionCategory('EXPENSE', txn)"
+                    [disabled]="!hasCategoryChanged('EXPENSE', txn) || isSavingTransaction('EXPENSE', txn.id) || isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-button danger"
+                    [title]="isDeletingType('EXPENSE') ? 'Deleting expense transaction' : 'Delete expense transaction'"
+                    [attr.aria-label]="isDeletingType('EXPENSE') ? 'Deleting expense transaction' : 'Delete expense transaction'"
+                    (click)="deleteTransaction('EXPENSE', txn.id)"
+                    [disabled]="isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="table-actions">
         <button
           type="button"
@@ -186,11 +208,12 @@
           {{ isDeletingType('EXPENSE') ? 'Deleting...' : 'Delete All' }}
         </button>
       </div>
-      <p class="table-total"><strong>Total:</strong> {{ expenseTotal | currency }}</p>
     </article>
 
     <article>
-      <h2>Add Income</h2>
+      <h2 class="section-heading">
+        Add <span class="account-accent">{{ selectedAccountName }}</span> Account Income
+      </h2>
       <form (ngSubmit)="addIncome()" #incomeFormRef="ngForm">
         <input name="incomeDate" type="date" [(ngModel)]="incomeForm.date" required />
         <input name="incomeAmount" type="number" step="0.01" min="0.01" [(ngModel)]="incomeForm.amount" required />
@@ -199,54 +222,74 @@
           <option [ngValue]="null">Select category</option>
           <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
         </select>
-        <button type="submit" [disabled]="incomeFormRef.invalid">Add Income</button>
+        <div class="form-footer">
+          <button type="submit" [disabled]="incomeFormRef.invalid">Add Income</button>
+          <p class="form-total"><strong>Total:</strong> {{ incomeTotal | currency }}</p>
+        </div>
       </form>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Account</th>
-            <th>Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let txn of incomes">
-            <td>{{ txn.date }}</td>
-            <td>{{ txn.amount | currency }}</td>
-            <td>{{ txn.description }}</td>
-            <td>{{ txn.accountName || '-' }}</td>
-            <td>
-              <select
-                [ngModel]="incomeCategoryByTransactionId[txn.id]"
-                [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event)"
-              >
-                <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
-              </select>
-            </td>
-            <td class="actions">
-              <button
-                type="button"
-                (click)="saveTransactionCategory('INCOME', txn)"
-                [disabled]="!hasCategoryChanged('INCOME', txn) || isSavingTransaction('INCOME', txn.id) || isSavingType('INCOME') || isDeletingType('INCOME')"
-              >
-                {{ isSavingTransaction('INCOME', txn.id) ? 'Saving...' : 'Save' }}
-              </button>
-              <button
-                type="button"
-                class="danger"
-                (click)="deleteTransaction('INCOME', txn.id)"
-                [disabled]="isSavingType('INCOME') || isDeletingType('INCOME')"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th class="col-date">Date</th>
+              <th class="col-amount">Amount</th>
+              <th class="col-description">Description</th>
+              <th class="col-category">Category</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let txn of incomes">
+              <td>{{ txn.date }}</td>
+              <td>{{ txn.amount | currency }}</td>
+              <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
+              <td class="category-cell">
+                <select
+                  [ngModel]="incomeCategoryByTransactionId[txn.id]"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event)"
+                >
+                  <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
+                </select>
+              </td>
+              <td class="actions-cell">
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="icon-button"
+                    [title]="isSavingTransaction('INCOME', txn.id) ? 'Saving income transaction' : 'Save income transaction'"
+                    [attr.aria-label]="isSavingTransaction('INCOME', txn.id) ? 'Saving income transaction' : 'Save income transaction'"
+                    (click)="saveTransactionCategory('INCOME', txn)"
+                    [disabled]="!hasCategoryChanged('INCOME', txn) || isSavingTransaction('INCOME', txn.id) || isSavingType('INCOME') || isDeletingType('INCOME')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-button danger"
+                    [title]="isDeletingType('INCOME') ? 'Deleting income transaction' : 'Delete income transaction'"
+                    [attr.aria-label]="isDeletingType('INCOME') ? 'Deleting income transaction' : 'Delete income transaction'"
+                    (click)="deleteTransaction('INCOME', txn.id)"
+                    [disabled]="isSavingType('INCOME') || isDeletingType('INCOME')"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="table-actions">
         <button
           type="button"
@@ -264,7 +307,6 @@
           {{ isDeletingType('INCOME') ? 'Deleting...' : 'Delete All' }}
         </button>
       </div>
-      <p class="table-total"><strong>Total:</strong> {{ incomeTotal | currency }}</p>
     </article>
   </div>
 </section>
