@@ -14,6 +14,14 @@ body {
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
 
+app-root,
+app-dashboard-page,
+app-transactions-page,
+app-plans-page,
+app-pwa-install-banner {
+  display: block;
+}
+
 .shell-banner,
 .shell-status {
   max-width: 1200px;
@@ -50,9 +58,222 @@ body {
   font: inherit;
 }
 
+.session-chip__toggle {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  background: transparent;
+  color: #12313f;
+}
+
+.session-chip__toggle svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.session-chip__inline-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.session-menu {
+  display: none;
+}
+
+.mobile-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.mobile-icon-button__icon {
+  display: none;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.transaction-detail-row {
+  display: none;
+}
+
+.transaction-detail-cell {
+  padding: 0;
+}
+
+.transaction-detail-grid {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  background: #f8fcfd;
+}
+
+.transaction-detail-item {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.transaction-detail-label {
+  color: #4c6b79;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.transaction-detail-value {
+  overflow-wrap: anywhere;
+}
+
+.transaction-detail-item select {
+  width: 100%;
+}
+
 @media (max-width: 860px) {
+  app-root,
+  app-dashboard-page,
+  app-transactions-page,
+  app-plans-page,
+  app-pwa-install-banner {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  app-root .content {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .shell-banner,
   .shell-status {
     padding: 0 1rem;
+  }
+
+  .session-chip__email,
+  .session-chip__inline-actions {
+    display: none;
+  }
+
+  .session-chip__toggle {
+    display: inline-flex;
+    flex: 1 1 auto;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  .session-chip__toggle span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .session-menu {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    right: 0;
+    z-index: 15;
+    display: grid;
+    gap: 0.4rem;
+    min-width: 11rem;
+    padding: 0.45rem;
+    border: 1px solid #c7dae1;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 12px 30px rgba(18, 49, 63, 0.12);
+  }
+
+  .session-menu__item {
+    width: 100%;
+  }
+
+  .mobile-icon-button {
+    width: 2.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 999px;
+  }
+
+  .mobile-icon-button__label {
+    display: none;
+  }
+
+  .mobile-icon-button__icon {
+    display: block;
+  }
+
+  .account-create .mobile-icon-button,
+  .import-form .mobile-icon-button,
+  .form-footer .mobile-icon-button,
+  .table-actions .mobile-icon-button {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 1000px) {
+  .actions-cell {
+    padding-inline: 0.25rem;
+  }
+
+  .actions {
+    gap: 0.25rem;
+    justify-content: center;
+  }
+
+  .col-date {
+    width: calc((100% - 5.15rem) / 2);
+  }
+
+  .col-amount {
+    width: calc((100% - 5.15rem) / 2);
+  }
+
+  .col-actions {
+    width: 5.15rem;
+  }
+
+  .col-description,
+  .col-category,
+  .description-cell,
+  .category-cell {
+    display: none;
+  }
+
+  .transaction-main-row td {
+    border-bottom: none;
+  }
+
+  .transaction-detail-row {
+    display: table-row;
+  }
+
+  .transaction-detail-cell {
+    padding: 0;
+    border-bottom: 1px solid #e8eff1;
+  }
+}
+
+@media (max-width: 1000px) and (orientation: landscape) {
+  .col-date {
+    width: calc((100% - 5.15rem) / 3);
+  }
+
+  .col-amount {
+    width: calc((100% - 5.15rem) / 3);
+  }
+
+  .col-category,
+  .category-cell {
+    display: table-cell;
+  }
+
+  .col-category {
+    width: calc((100% - 5.15rem) / 3);
+  }
+
+  .transaction-detail-item--category {
+    display: none;
   }
 }

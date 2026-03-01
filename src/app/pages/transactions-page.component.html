@@ -23,7 +23,12 @@
       placeholder="Add account name"
       maxlength="120"
     />
-    <button type="button" (click)="addAccount()">Add Account</button>
+    <button type="button" class="mobile-icon-button" title="Add Account" aria-label="Add Account" (click)="addAccount()">
+      <span class="mobile-icon-button__label">Add Account</span>
+      <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
+      </svg>
+    </button>
   </div>
 
   <article class="import-panel">
@@ -35,8 +40,23 @@
         accept=".csv"
         (change)="onStatementFileChanged($event)"
       />
-      <button type="button" (click)="uploadStatement(statementFileInput)" [disabled]="uploading || !selectedAccountId">
-        {{ uploading ? 'Importing...' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement') }}
+      <button
+        type="button"
+        class="mobile-icon-button"
+        [title]="uploading ? 'Importing statement' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement')"
+        [attr.aria-label]="uploading ? 'Importing statement' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement')"
+        (click)="uploadStatement(statementFileInput)"
+        [disabled]="uploading || !selectedAccountId"
+      >
+        <span class="mobile-icon-button__label">
+          {{ uploading ? 'Importing...' : (headerMappingPrompt ? 'Import With Mapping' : 'Upload Statement') }}
+        </span>
+        <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 3l4 4h-3v7h-2V7H8l4-4zm-7 13h14v5H5v-5z"
+            fill="currentColor"
+          />
+        </svg>
       </button>
     </div>
     <p class="muted" *ngIf="selectedStatementFileName">Selected: {{ selectedStatementFileName }}</p>
@@ -124,7 +144,12 @@
           <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
         </select>
         <div class="form-footer">
-          <button type="submit" [disabled]="expenseFormRef.invalid">Add Expense</button>
+          <button type="submit" class="mobile-icon-button" title="Add Expense" aria-label="Add Expense" [disabled]="expenseFormRef.invalid">
+            <span class="mobile-icon-button__label">Add Expense</span>
+            <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
+            </svg>
+          </button>
           <p class="form-total"><strong>Total:</strong> {{ expenseTotal | currency }}</p>
         </div>
       </form>
@@ -140,72 +165,111 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let txn of expenses">
-              <td>{{ txn.date }}</td>
-              <td>{{ txn.amount | currency }}</td>
-              <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
-              <td class="category-cell">
-                <select
-                  [ngModel]="expenseCategoryByTransactionId[txn.id]"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event)"
-                >
-                  <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
-                </select>
-              </td>
-              <td class="actions-cell">
-                <div class="actions">
-                  <button
-                    type="button"
-                    class="icon-button"
-                    [title]="isSavingTransaction('EXPENSE', txn.id) ? 'Saving expense transaction' : 'Save expense transaction'"
-                    [attr.aria-label]="isSavingTransaction('EXPENSE', txn.id) ? 'Saving expense transaction' : 'Save expense transaction'"
-                    (click)="saveTransactionCategory('EXPENSE', txn)"
-                    [disabled]="!hasCategoryChanged('EXPENSE', txn) || isSavingTransaction('EXPENSE', txn.id) || isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
+            <ng-container *ngFor="let txn of expenses">
+              <tr class="transaction-main-row">
+                <td>{{ formatShortDate(txn.date) }}</td>
+                <td>{{ txn.amount | currency }}</td>
+                <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
+                <td class="category-cell">
+                  <select
+                    [ngModel]="expenseCategoryByTransactionId[txn.id]"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event)"
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-button danger"
-                    [title]="isDeletingType('EXPENSE') ? 'Deleting expense transaction' : 'Delete expense transaction'"
-                    [attr.aria-label]="isDeletingType('EXPENSE') ? 'Deleting expense transaction' : 'Delete expense transaction'"
-                    (click)="deleteTransaction('EXPENSE', txn.id)"
-                    [disabled]="isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
+                    <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
+                  </select>
+                </td>
+                <td class="actions-cell">
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="icon-button"
+                      [title]="isSavingTransaction('EXPENSE', txn.id) ? 'Saving expense transaction' : 'Save expense transaction'"
+                      [attr.aria-label]="isSavingTransaction('EXPENSE', txn.id) ? 'Saving expense transaction' : 'Save expense transaction'"
+                      (click)="saveTransactionCategory('EXPENSE', txn)"
+                      [disabled]="!hasCategoryChanged('EXPENSE', txn) || isSavingTransaction('EXPENSE', txn.id) || isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-button danger"
+                      [title]="isDeletingType('EXPENSE') ? 'Deleting expense transaction' : 'Delete expense transaction'"
+                      [attr.aria-label]="isDeletingType('EXPENSE') ? 'Deleting expense transaction' : 'Delete expense transaction'"
+                      (click)="deleteTransaction('EXPENSE', txn.id)"
+                      [disabled]="isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="transaction-detail-row">
+                <td class="transaction-detail-cell" colspan="5">
+                  <div class="transaction-detail-grid">
+                    <div class="transaction-detail-item transaction-detail-item--description">
+                      <span class="transaction-detail-label">Description</span>
+                      <span class="transaction-detail-value" [title]="txn.description">{{ txn.description }}</span>
+                    </div>
+                    <div class="transaction-detail-item transaction-detail-item--category">
+                      <span class="transaction-detail-label">Category</span>
+                      <select
+                        [ngModel]="expenseCategoryByTransactionId[txn.id]"
+                        [ngModelOptions]="{ standalone: true }"
+                        (ngModelChange)="onTransactionCategoryChanged('EXPENSE', txn.id, $event)"
+                      >
+                        <option *ngFor="let category of expenseCategories" [ngValue]="category.id">{{ category.name }}</option>
+                      </select>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>
       <div class="table-actions">
         <button
           type="button"
+          class="mobile-icon-button"
+          [title]="isSavingType('EXPENSE') ? 'Saving expense changes' : 'Save All Expense Changes'"
+          [attr.aria-label]="isSavingType('EXPENSE') ? 'Saving expense changes' : 'Save All Expense Changes'"
           (click)="saveAllTransactionCategories('EXPENSE')"
           [disabled]="!hasPendingCategoryChanges('EXPENSE') || isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
         >
-          {{ isSavingType('EXPENSE') ? 'Saving...' : 'Save All Changes' }}
+          <span class="mobile-icon-button__label">{{ isSavingType('EXPENSE') ? 'Saving...' : 'Save All Changes' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+              fill="currentColor"
+            />
+          </svg>
         </button>
         <button
           type="button"
-          class="danger"
+          class="danger mobile-icon-button"
+          [title]="isDeletingType('EXPENSE') ? 'Deleting all expense transactions' : 'Delete All Expense Transactions'"
+          [attr.aria-label]="isDeletingType('EXPENSE') ? 'Deleting all expense transactions' : 'Delete All Expense Transactions'"
           (click)="deleteAllTransactions('EXPENSE')"
           [disabled]="!hasTransactions('EXPENSE') || isSavingType('EXPENSE') || isDeletingType('EXPENSE')"
         >
-          {{ isDeletingType('EXPENSE') ? 'Deleting...' : 'Delete All' }}
+          <span class="mobile-icon-button__label">{{ isDeletingType('EXPENSE') ? 'Deleting...' : 'Delete All' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+              fill="currentColor"
+            />
+          </svg>
         </button>
       </div>
     </article>
@@ -223,7 +287,12 @@
           <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
         </select>
         <div class="form-footer">
-          <button type="submit" [disabled]="incomeFormRef.invalid">Add Income</button>
+          <button type="submit" class="mobile-icon-button" title="Add Income" aria-label="Add Income" [disabled]="incomeFormRef.invalid">
+            <span class="mobile-icon-button__label">Add Income</span>
+            <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4z" fill="currentColor" />
+            </svg>
+          </button>
           <p class="form-total"><strong>Total:</strong> {{ incomeTotal | currency }}</p>
         </div>
       </form>
@@ -239,72 +308,111 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let txn of incomes">
-              <td>{{ txn.date }}</td>
-              <td>{{ txn.amount | currency }}</td>
-              <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
-              <td class="category-cell">
-                <select
-                  [ngModel]="incomeCategoryByTransactionId[txn.id]"
-                  [ngModelOptions]="{ standalone: true }"
-                  (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event)"
-                >
-                  <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
-                </select>
-              </td>
-              <td class="actions-cell">
-                <div class="actions">
-                  <button
-                    type="button"
-                    class="icon-button"
-                    [title]="isSavingTransaction('INCOME', txn.id) ? 'Saving income transaction' : 'Save income transaction'"
-                    [attr.aria-label]="isSavingTransaction('INCOME', txn.id) ? 'Saving income transaction' : 'Save income transaction'"
-                    (click)="saveTransactionCategory('INCOME', txn)"
-                    [disabled]="!hasCategoryChanged('INCOME', txn) || isSavingTransaction('INCOME', txn.id) || isSavingType('INCOME') || isDeletingType('INCOME')"
+            <ng-container *ngFor="let txn of incomes">
+              <tr class="transaction-main-row">
+                <td>{{ formatShortDate(txn.date) }}</td>
+                <td>{{ txn.amount | currency }}</td>
+                <td class="description-cell" [title]="txn.description">{{ txn.description }}</td>
+                <td class="category-cell">
+                  <select
+                    [ngModel]="incomeCategoryByTransactionId[txn.id]"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event)"
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-button danger"
-                    [title]="isDeletingType('INCOME') ? 'Deleting income transaction' : 'Delete income transaction'"
-                    [attr.aria-label]="isDeletingType('INCOME') ? 'Deleting income transaction' : 'Delete income transaction'"
-                    (click)="deleteTransaction('INCOME', txn.id)"
-                    [disabled]="isSavingType('INCOME') || isDeletingType('INCOME')"
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
+                    <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
+                  </select>
+                </td>
+                <td class="actions-cell">
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="icon-button"
+                      [title]="isSavingTransaction('INCOME', txn.id) ? 'Saving income transaction' : 'Save income transaction'"
+                      [attr.aria-label]="isSavingTransaction('INCOME', txn.id) ? 'Saving income transaction' : 'Save income transaction'"
+                      (click)="saveTransactionCategory('INCOME', txn)"
+                      [disabled]="!hasCategoryChanged('INCOME', txn) || isSavingTransaction('INCOME', txn.id) || isSavingType('INCOME') || isDeletingType('INCOME')"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-button danger"
+                      [title]="isDeletingType('INCOME') ? 'Deleting income transaction' : 'Delete income transaction'"
+                      [attr.aria-label]="isDeletingType('INCOME') ? 'Deleting income transaction' : 'Delete income transaction'"
+                      (click)="deleteTransaction('INCOME', txn.id)"
+                      [disabled]="isSavingType('INCOME') || isDeletingType('INCOME')"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="transaction-detail-row">
+                <td class="transaction-detail-cell" colspan="5">
+                  <div class="transaction-detail-grid">
+                    <div class="transaction-detail-item transaction-detail-item--description">
+                      <span class="transaction-detail-label">Description</span>
+                      <span class="transaction-detail-value" [title]="txn.description">{{ txn.description }}</span>
+                    </div>
+                    <div class="transaction-detail-item transaction-detail-item--category">
+                      <span class="transaction-detail-label">Category</span>
+                      <select
+                        [ngModel]="incomeCategoryByTransactionId[txn.id]"
+                        [ngModelOptions]="{ standalone: true }"
+                        (ngModelChange)="onTransactionCategoryChanged('INCOME', txn.id, $event)"
+                      >
+                        <option *ngFor="let category of incomeCategories" [ngValue]="category.id">{{ category.name }}</option>
+                      </select>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>
       <div class="table-actions">
         <button
           type="button"
+          class="mobile-icon-button"
+          [title]="isSavingType('INCOME') ? 'Saving income changes' : 'Save All Income Changes'"
+          [attr.aria-label]="isSavingType('INCOME') ? 'Saving income changes' : 'Save All Income Changes'"
           (click)="saveAllTransactionCategories('INCOME')"
           [disabled]="!hasPendingCategoryChanges('INCOME') || isSavingType('INCOME') || isDeletingType('INCOME')"
         >
-          {{ isSavingType('INCOME') ? 'Saving...' : 'Save All Changes' }}
+          <span class="mobile-icon-button__label">{{ isSavingType('INCOME') ? 'Saving...' : 'Save All Changes' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 3h11l3 3v15H5V3zm2 2v5h8V5H7zm0 9v5h10v-7H7v2zm2 1h6v3H9v-3z"
+              fill="currentColor"
+            />
+          </svg>
         </button>
         <button
           type="button"
-          class="danger"
+          class="danger mobile-icon-button"
+          [title]="isDeletingType('INCOME') ? 'Deleting all income transactions' : 'Delete All Income Transactions'"
+          [attr.aria-label]="isDeletingType('INCOME') ? 'Deleting all income transactions' : 'Delete All Income Transactions'"
           (click)="deleteAllTransactions('INCOME')"
           [disabled]="!hasTransactions('INCOME') || isSavingType('INCOME') || isDeletingType('INCOME')"
         >
-          {{ isDeletingType('INCOME') ? 'Deleting...' : 'Delete All' }}
+          <span class="mobile-icon-button__label">{{ isDeletingType('INCOME') ? 'Deleting...' : 'Delete All' }}</span>
+          <svg class="mobile-icon-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 10h8a2 2 0 0 0 2-2V7H6v10a2 2 0 0 0 2 2z"
+              fill="currentColor"
+            />
+          </svg>
         </button>
       </div>
     </article>

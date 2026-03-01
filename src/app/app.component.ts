@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
@@ -20,8 +20,11 @@ export class AppComponent {
   nextPassword = '';
   confirmNextPassword = '';
   showPasswordPanel = false;
+  showSessionMenu = false;
+  hideTopbarOnScroll = false;
   authBusy = false;
   authMessage = '';
+  private lastScrollY = 0;
 
   constructor(
     readonly auth: AuthService,
@@ -104,6 +107,7 @@ export class AppComponent {
   }
 
   openPasswordPanel(): void {
+    this.showSessionMenu = false;
     this.showPasswordPanel = true;
     this.authMessage = '';
     this.resetPasswordFields();
@@ -113,6 +117,55 @@ export class AppComponent {
     this.showPasswordPanel = false;
     this.authMessage = '';
     this.resetPasswordFields();
+  }
+
+  toggleSessionMenu(): void {
+    this.showSessionMenu = !this.showSessionMenu;
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (typeof globalThis.window === 'undefined' || typeof globalThis.document === 'undefined') {
+      return;
+    }
+
+    const currentScrollY = Math.max(globalThis.window.scrollY || 0, 0);
+    const scrollRoot = globalThis.document.documentElement;
+    const isScrollable = scrollRoot.scrollHeight > globalThis.window.innerHeight + 1;
+
+    if (!isScrollable || currentScrollY <= 0) {
+      this.hideTopbarOnScroll = false;
+      this.lastScrollY = currentScrollY;
+      return;
+    }
+
+    const delta = currentScrollY - this.lastScrollY;
+    if (Math.abs(delta) < 8) {
+      return;
+    }
+
+    this.hideTopbarOnScroll = delta > 0 && currentScrollY > 96;
+    if (this.hideTopbarOnScroll) {
+      this.showSessionMenu = false;
+    }
+
+    if (delta < 0) {
+      this.hideTopbarOnScroll = false;
+    }
+
+    this.lastScrollY = currentScrollY;
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (typeof globalThis.window === 'undefined' || typeof globalThis.document === 'undefined') {
+      return;
+    }
+
+    const scrollRoot = globalThis.document.documentElement;
+    if (scrollRoot.scrollHeight <= globalThis.window.innerHeight + 1) {
+      this.hideTopbarOnScroll = false;
+    }
   }
 
   async signInWithPassword(): Promise<void> {
@@ -160,6 +213,7 @@ export class AppComponent {
     this.authBusy = true;
     this.authMessage = '';
     this.showPasswordPanel = false;
+    this.showSessionMenu = false;
 
     try {
       await this.auth.signOut();

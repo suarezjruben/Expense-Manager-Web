@@ -48,7 +48,7 @@
 
     <ng-template #appState>
       <ng-container *ngIf="auth.session$ | async as session; else authState">
-        <header class="topbar">
+        <header class="topbar" [class.topbar--hidden]="hideTopbarOnScroll">
           <div class="brand">
             <span class="brand-mark"></span>
             <span>Expense Manager</span>
@@ -60,11 +60,34 @@
               <a routerLink="/plans" routerLinkActive="active">Plans & Categories</a>
             </nav>
             <div class="session-chip">
-              <span>{{ session.user.email }}</span>
-              <button type="button" class="ghost-button" (click)="openPasswordPanel()" [disabled]="authBusy">
-                Set Password
+              <span class="session-chip__email">{{ session.user.email }}</span>
+              <button
+                type="button"
+                class="session-chip__toggle"
+                [attr.aria-expanded]="showSessionMenu"
+                aria-haspopup="menu"
+                (click)="toggleSessionMenu()"
+                [disabled]="authBusy"
+              >
+                <span>{{ session.user.email }}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
+                </svg>
               </button>
-              <button type="button" (click)="signOut()" [disabled]="authBusy">Sign Out</button>
+              <div class="session-chip__inline-actions">
+                <button type="button" class="ghost-button" (click)="openPasswordPanel()" [disabled]="authBusy">
+                  Set Password
+                </button>
+                <button type="button" (click)="signOut()" [disabled]="authBusy">Sign Out</button>
+              </div>
+              <div class="session-menu" *ngIf="showSessionMenu">
+                <button type="button" class="session-menu__item ghost-button" (click)="openPasswordPanel()" [disabled]="authBusy">
+                  Set Password
+                </button>
+                <button type="button" class="session-menu__item" (click)="signOut()" [disabled]="authBusy">
+                  Sign Out
+                </button>
+              </div>
             </div>
           </div>
         </header>

@@ -19,10 +19,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.85);
   border-bottom: 1px solid #d7e3e8;
   backdrop-filter: blur(8px);
+  transition: transform 0.22s ease;
+  will-change: transform;
+}
+
+.topbar--hidden {
+  transform: translateY(calc(-100% - 1px));
 }
 
 .brand {
@@ -70,12 +77,13 @@ nav a.active {
 }
 
 .content {
-  max-width: 1200px;
+  max-width: 95vw;
   margin: 0 auto;
   padding: 1.25rem;
 }
 
 .session-chip {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -99,6 +107,10 @@ nav a.active {
 .session-chip button:disabled {
   cursor: wait;
   opacity: 0.7;
+}
+
+.session-chip__email {
+  white-space: nowrap;
 }
 
 .gate {
@@ -245,6 +257,7 @@ nav a.active {
   }
 
   .session-chip {
+    width: 100%;
     justify-content: space-between;
   }
 

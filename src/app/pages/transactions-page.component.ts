@@ -134,6 +134,15 @@ export class TransactionsPageComponent implements OnInit {
     return this.accounts.find((account) => account.id === this.selectedAccountId)?.name ?? 'Selected Account';
   }
 
+  formatShortDate(value: string): string {
+    const [year = '', month = '', day = ''] = value.split('-');
+    if (!year || !month || !day) {
+      return value;
+    }
+
+    return `${year.slice(-2)}/${month}/${day}`;
+  }
+
   deleteTransaction(type: TransactionType, id: number): void {
     if (!this.selectedAccountId) {
       this.error = 'Account is required';
