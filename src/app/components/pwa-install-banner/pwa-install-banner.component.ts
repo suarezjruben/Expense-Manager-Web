@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { PwaInstallService } from '../core/pwa-install.service';
+import { PwaInstallService } from '../../core/pwa-install.service';
 
 @Component({
   selector: 'app-pwa-install-banner',

@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { ApiService } from '../core/api.service';
-import { MonthSummaryDto } from '../core/api.models';
-import { MonthStateService } from '../core/month-state.service';
+import { ApiService } from '../../core/api.service';
+import { MonthSummaryDto } from '../../core/api.models';
+import { MonthStateService } from '../../core/month-state.service';
 
 @Component({
   selector: 'app-dashboard-page',

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { DashboardPageComponent } from './pages/dashboard-page.component';
-import { TransactionsPageComponent } from './pages/transactions-page.component';
-import { PlansPageComponent } from './pages/plans-page.component';
+import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
+import { PlansPageComponent } from './pages/plans-page/plans-page.component';
+import { TransactionsPageComponent } from './pages/transactions-page/transactions-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

@@ -3,9 +3,9 @@ import { provideRouter } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { Session } from '@supabase/supabase-js';
 import { AppComponent } from './app.component';
-import { AuthService } from './core/auth.service';
-import { PwaInstallService, PwaInstallState } from './core/pwa-install.service';
-import { SupabaseService } from './core/supabase.service';
+import { AuthService } from '../core/auth.service';
+import { PwaInstallService, PwaInstallState } from '../core/pwa-install.service';
+import { SupabaseService } from '../core/supabase.service';
 
 class MockAuthService {
   private readonly sessionSubject = new BehaviorSubject<Session | null>(null);

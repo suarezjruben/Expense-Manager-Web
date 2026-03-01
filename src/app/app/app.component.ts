@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from './core/auth.service';
-import { PwaInstallService } from './core/pwa-install.service';
-import { SupabaseService } from './core/supabase.service';
-import { PwaInstallBannerComponent } from './components/pwa-install-banner.component';
+import { PwaInstallBannerComponent } from '../components/pwa-install-banner/pwa-install-banner.component';
+import { AuthService } from '../core/auth.service';
+import { PwaInstallService } from '../core/pwa-install.service';
+import { SupabaseService } from '../core/supabase.service';
 
 @Component({
   selector: 'app-root',

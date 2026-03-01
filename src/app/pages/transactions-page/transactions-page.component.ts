@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin } from 'rxjs';
-import { ApiService } from '../core/api.service';
-import { MonthStateService } from '../core/month-state.service';
+import { ApiService } from '../../core/api.service';
+import { MonthStateService } from '../../core/month-state.service';
 import {
   AccountDto,
   CategoryDto,
@@ -12,7 +12,7 @@ import {
   ImportSummaryDto,
   TransactionDto,
   TransactionType
-} from '../core/api.models';
+} from '../../core/api.models';
 
 interface NewTransactionForm {
   date: string;

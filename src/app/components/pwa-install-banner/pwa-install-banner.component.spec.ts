@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { PwaInstallBannerComponent } from './pwa-install-banner.component';
-import { PwaInstallService, PwaInstallState } from '../core/pwa-install.service';
+import { PwaInstallService, PwaInstallState } from '../../core/pwa-install.service';
 
 class MockPwaInstallService {
   private readonly stateSubject = new BehaviorSubject<PwaInstallState>({

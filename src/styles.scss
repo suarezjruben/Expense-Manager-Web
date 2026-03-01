@@ -96,6 +96,26 @@ app-pwa-install-banner {
   flex: 0 0 auto;
 }
 
+.transactions-table {
+  --mobile-action-col-width: 5.15rem;
+}
+
+.transactions-table .table-col--date {
+  width: 5rem;
+}
+
+.transactions-table .table-col--amount {
+  width: 5rem;
+}
+
+.transactions-table .table-col--category {
+  width: 7.5rem;
+}
+
+.transactions-table .table-col--actions {
+  width: 5rem;
+}
+
 .transaction-detail-row {
   display: none;
 }
@@ -213,32 +233,25 @@ app-pwa-install-banner {
 }
 
 @media (max-width: 1000px) {
-  .actions-cell {
-    padding-inline: 0.25rem;
-  }
-
-  .actions {
-    gap: 0.25rem;
-    justify-content: center;
-  }
-
-  .col-date {
-    width: calc((100% - 5.15rem) / 2);
-  }
-
-  .col-amount {
-    width: calc((100% - 5.15rem) / 2);
-  }
-
-  .col-actions {
-    width: 5.15rem;
-  }
-
   .col-description,
-  .col-category,
-  .description-cell,
-  .category-cell {
+  .description-cell {
     display: none;
+  }
+
+  .transactions-table .table-col--description {
+    width: 0;
+  }
+
+  .transactions-table .table-col--date {
+    width: calc((100% - var(--mobile-action-col-width)) / 2);
+  }
+
+  .transactions-table .table-col--amount {
+    width: calc((100% - var(--mobile-action-col-width)) / 2);
+  }
+
+  .transactions-table .table-col--actions {
+    width: var(--mobile-action-col-width);
   }
 
   .transaction-main-row td {
@@ -256,24 +269,41 @@ app-pwa-install-banner {
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {
-  .col-date {
-    width: calc((100% - 5.15rem) / 3);
-  }
-
-  .col-amount {
-    width: calc((100% - 5.15rem) / 3);
-  }
-
-  .col-category,
-  .category-cell {
+  .transactions-table .col-category,
+  .transactions-table .category-cell {
     display: table-cell;
   }
 
-  .col-category {
-    width: calc((100% - 5.15rem) / 3);
+  .transactions-table .table-col--date {
+    width: calc((100% - var(--mobile-action-col-width)) / 3);
+  }
+
+  .transactions-table .table-col--amount {
+    width: calc((100% - var(--mobile-action-col-width)) / 3);
+  }
+
+  .transactions-table .table-col--category {
+    width: calc((100% - var(--mobile-action-col-width)) / 3);
+  }
+
+  .transactions-table .category-cell select {
+    display: block;
+    width: 100%;
+    min-width: 0;
   }
 
   .transaction-detail-item--category {
     display: none;
+  }
+}
+
+@media (max-width: 1000px) and (orientation: portrait) {
+  .transactions-table .col-category,
+  .transactions-table .category-cell {
+    display: none;
+  }
+
+  .transactions-table .table-col--category {
+    width: 0;
   }
 }

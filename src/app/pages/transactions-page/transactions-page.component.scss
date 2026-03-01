@@ -174,24 +174,8 @@ table {
 }
 
 .transactions-table {
-  min-width: 100%;
+  width: 100%;
   table-layout: fixed;
-}
-
-.col-date {
-  width: 5rem;
-}
-
-.col-amount {
-  width: 5rem;
-}
-
-.col-category {
-  width: 7.5rem;
-}
-
-.col-actions {
-  width: 5rem;
 }
 
 th,
@@ -310,7 +294,13 @@ th {
     white-space: normal;
   }
 
-  .col-category {
-    width: 8.5rem;
+  .actions-cell {
+    padding-inline: 0.25rem;
   }
+
+  .actions {
+    gap: 0.25rem;
+    justify-content: center;
+  }
+
 }
