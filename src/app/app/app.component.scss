@@ -62,12 +62,17 @@ nav {
 /* Layout wrapper for right-side top bar actions and session controls. */
 .topbar-actions {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 1rem;
+  text-align: center;
 }
 
 /* Base navigation link styling for top bar routes. */
 nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #34505e;
   text-decoration: none;
   font-weight: 600;
@@ -291,7 +296,7 @@ nav a.active {
   .topbar-actions {
     width: 100%;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
 
   /* Expand the session chip to the full mobile header width. */
